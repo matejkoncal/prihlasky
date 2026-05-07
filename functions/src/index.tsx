@@ -10,10 +10,15 @@ const resendApiKey = defineSecret("RESEND_API_KEY");
 
 const app = express();
 app.use(cors({ origin: true }));
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
-const RECIPIENT_EMAIL = "matej@koncal.sk";
+const RECIPIENT_EMAILS = ["matej@koncal.sk", "slosarovalucia1@gmail.com"];
 const SENDER_EMAIL = "prihlasky@koncal.sk";
+
+interface FileAttachment {
+  name: string;
+  content: string; // base64
+}
 
 interface FormData {
   name: string;
@@ -24,6 +29,8 @@ interface FormData {
   address3: string;
   phone: string;
   email: string;
+  cv?: FileAttachment;
+  motivationLetter?: FileAttachment;
 }
 
 app.post("/api/submit", async (req: express.Request, res: express.Response) => {
@@ -62,7 +69,7 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
     const resend = new Resend(resendApiKey.value());
     await resend.emails.send({
       from: `Erasmus+ Prihlášky <${SENDER_EMAIL}>`,
-      to: [RECIPIENT_EMAIL],
+      to: RECIPIENT_EMAILS,
       subject: `Nová prihláška Erasmus+ - ${data.name}`,
       html: `
         <h2>Nová prihláška do výberového konania Erasmus+ 2026/2027</h2>
@@ -79,6 +86,22 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
           filename: `prihlaska-erasmus-${data.name.replace(/\s+/g, "-").toLowerCase()}.pdf`,
           content: Buffer.from(pdfBytes).toString("base64"),
         },
+        ...(data.cv
+          ? [
+              {
+                filename: data.cv.name,
+                content: data.cv.content,
+              },
+            ]
+          : []),
+        ...(data.motivationLetter
+          ? [
+              {
+                filename: data.motivationLetter.name,
+                content: data.motivationLetter.content,
+              },
+            ]
+          : []),
       ],
     });
 

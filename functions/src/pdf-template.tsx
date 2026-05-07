@@ -133,55 +133,6 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
           <Text style={value}>{data.email}</Text>
         </View>
 
-        {/* Confirmation text */}
-        <View style={{ marginTop: 24 }}>
-          <Text style={{ fontSize: 10, lineHeight: 1.6 }}>
-            Svojím podpisom potvrdzujem prihlášku do výberového konania na
-            projekt Erasmus+.
-          </Text>
-          <Text style={{ fontSize: 10, lineHeight: 1.6, color: "#555" }}>
-            I confirm the application for the tender for the Erasmus+ project.
-          </Text>
-        </View>
-
-        {/* Date and signature */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 32,
-          }}
-        >
-          <View>
-            <Text style={{ fontSize: 10 }}>V Bratislave, dňa: {data.date}</Text>
-          </View>
-          <View>
-            <Text style={{ fontSize: 10 }}>
-              Podpis / Signature: ............................
-            </Text>
-          </View>
-        </View>
-
-        {/* Attachments */}
-        <View style={{ marginTop: 32 }}>
-          <Text
-            style={{
-              fontSize: 10,
-              textDecoration: "underline",
-              marginBottom: 6,
-            }}
-          >
-            Prílohy v anglickom jazyku / Attachment in English:
-          </Text>
-          <Text style={{ fontSize: 10, marginBottom: 4 }}>
-            Životopis – Europass - https://europa.eu/europass/en
-          </Text>
-          <Text style={{ fontSize: 10 }}>
-            Motivačný list (predstavy a očakávania účastníka mobility) formou
-            interview
-          </Text>
-        </View>
-
         {/* Footer */}
         <View style={{ marginTop: 60, textAlign: "center" }}>
           <Text style={{ fontSize: 9, color: "#999" }}>

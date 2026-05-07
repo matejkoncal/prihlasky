@@ -9,12 +9,12 @@ import {
   Alert,
   Box,
   Divider,
-  Link,
   CircularProgress,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import SendIcon from "@mui/icons-material/Send";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import sosLogo from "./assets/logos/sos-logo.jpg";
 import erasmusLogo from "./assets/logos/erasmus-logo.jpg";
 import saiacLogo from "./assets/logos/saaic-logo.jpg";
@@ -66,6 +66,8 @@ const API_URL = import.meta.env.VITE_API_URL || "";
 
 function App() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
+  const [cv, setCv] = useState<File | null>(null);
+  const [motivationLetter, setMotivationLetter] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -74,6 +76,17 @@ function App() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -81,10 +94,19 @@ function App() {
     setSuccess(false);
 
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         ...form,
         classField: `${form.trieda} – ${form.odbor}`,
       };
+      if (cv) {
+        payload.cv = { name: cv.name, content: await fileToBase64(cv) };
+      }
+      if (motivationLetter) {
+        payload.motivationLetter = {
+          name: motivationLetter.name,
+          content: await fileToBase64(motivationLetter),
+        };
+      }
       const res = await fetch(`${API_URL}/api/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +118,8 @@ function App() {
       }
       setSuccess(true);
       setForm(INITIAL_FORM);
+      setCv(null);
+      setMotivationLetter(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Neznáma chyba");
     } finally {
@@ -345,20 +369,51 @@ function App() {
                 gutterBottom
                 sx={{ fontWeight: 600, display: "block" }}
               >
-                Prílohy v anglickom jazyku / Attachments in English:
+                Prílohy / Attachments (nepovinné):
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Životopis – Europass –{" "}
-                <Link
-                  href="https://europa.eu/europass/en"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  europa.eu/europass
-                </Link>
-                <br />
-                Motivačný list (predstavy a očakávania účastníka mobility)
-                formou interview
+
+              <Button
+                component="label"
+                variant="outlined"
+                size="small"
+                startIcon={<AttachFileIcon />}
+                sx={{ textTransform: "none", mr: 1, mb: 1 }}
+              >
+                {cv ? cv.name : "Životopis / CV"}
+                <input
+                  type="file"
+                  hidden
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={(e) => setCv(e.target.files?.[0] || null)}
+                />
+              </Button>
+
+              <Button
+                component="label"
+                variant="outlined"
+                size="small"
+                startIcon={<AttachFileIcon />}
+                sx={{ textTransform: "none", mb: 1 }}
+              >
+                {motivationLetter
+                  ? motivationLetter.name
+                  : "Motivačný list / Motivation letter"}
+                <input
+                  type="file"
+                  hidden
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={(e) =>
+                    setMotivationLetter(e.target.files?.[0] || null)
+                  }
+                />
+              </Button>
+
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ display: "block", mt: 0.5 }}
+              >
+                Formát: PDF alebo DOCX
               </Typography>
             </Paper>
 
