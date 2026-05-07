@@ -32,6 +32,8 @@ jobs:
       - name: Build
         working-directory: web
         run: npm run build
+        env:
+          VITE_API_URL: https://us-central1-ai-helper-7d082.cloudfunctions.net/api
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

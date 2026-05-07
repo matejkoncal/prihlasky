@@ -1,16 +1,7 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
-import express from "express";
-import cors from "cors";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { renderDocument } from "@formepdf/core";
 import { Resend } from "resend";
-import { ApplicationPdf } from "./pdf-template";
-
-const resendApiKey = defineSecret("RESEND_API_KEY");
-
-const app = express();
-app.use(cors({ origin: true }));
-app.use(express.json());
+import { ApplicationPdf } from "../lib/pdf-template";
 
 const RECIPIENT_EMAIL = "slosarovalucia1@gmail.com";
 const SENDER_EMAIL = "prihlasky@koncal.sk";
@@ -26,21 +17,44 @@ interface FormData {
   email: string;
 }
 
-app.post("/api/submit", async (req: express.Request, res: express.Response) => {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
+  // CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
     const data: FormData = req.body;
 
     // Validate required fields
-    if (!data.name || !data.dateOfBirth || !data.classField || !data.address1 || !data.phone || !data.email) {
-      res.status(400).json({ error: "Vyplňte všetky povinné polia" });
-      return;
+    if (
+      !data.name ||
+      !data.dateOfBirth ||
+      !data.classField ||
+      !data.address1 ||
+      !data.phone ||
+      !data.email
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Vyplňte všetky povinné polia" });
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email)) {
-      res.status(400).json({ error: "Neplatná emailová adresa" });
-      return;
+      return res.status(400).json({ error: "Neplatná emailová adresa" });
     }
 
     const now = new Date();
@@ -52,7 +66,7 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
     );
 
     // Send email via Resend
-    const resend = new Resend(resendApiKey.value());
+    const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: `Erasmus+ Prihlášky <${SENDER_EMAIL}>`,
       to: [RECIPIENT_EMAIL],
@@ -75,12 +89,12 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
       ],
     });
 
-    res.status(200).json({ success: true });
+    return res.status(200).json({ success: true });
   } catch (err) {
     console.error("Error processing submission:", err);
-    res.status(500).json({ error: "Interná chyba servera" });
+    return res.status(500).json({ error: "Interná chyba servera" });
   }
-});
+}
 
 function escapeHtml(text: string): string {
   return text
@@ -90,5 +104,3 @@ function escapeHtml(text: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
-export const api = onRequest({ secrets: [resendApiKey] }, app);

@@ -1,18 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #f5f7fa;
-  color: #333;
+  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background: #f0f4f8;
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
 }
