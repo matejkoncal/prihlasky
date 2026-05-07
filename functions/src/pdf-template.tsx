@@ -1,4 +1,16 @@
 import { Document, Page, View, Text, Image } from "@formepdf/react";
+import fs from "fs";
+import path from "path";
+
+function loadImageAsDataUri(filename: string): string {
+  const filePath = path.join(__dirname, "assets", filename);
+  const data = fs.readFileSync(filePath);
+  return `data:image/jpeg;base64,${data.toString("base64")}`;
+}
+
+const sosLogo = loadImageAsDataUri("sos-logo.jpg");
+const erasmusLogo = loadImageAsDataUri("erasmus-logo.jpg");
+const saicLogo = loadImageAsDataUri("saaic-logo.jpg");
 
 interface ApplicationData {
   name: string;
@@ -63,9 +75,9 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
             marginBottom: 16,
           }}
         >
-          <Image src="./assets/sos-logo.jpg" height={50} />
-          <Image src="./assets/erasmus-logo.jpg" height={35} />
-          <Image src="./assets/saaic-logo.jpg" height={35} />
+          <Image src={sosLogo} height={50} />
+          <Image src={erasmusLogo} height={35} />
+          <Image src={saicLogo} height={35} />
         </View>
 
         {/* Title */}
