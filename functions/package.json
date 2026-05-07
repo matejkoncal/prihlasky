@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "lib/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/assets lib/",
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions"
   },

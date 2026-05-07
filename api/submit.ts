@@ -17,10 +17,7 @@ interface FormData {
   email: string;
 }
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -46,9 +43,7 @@ export default async function handler(
       !data.phone ||
       !data.email
     ) {
-      return res
-        .status(400)
-        .json({ error: "Vyplňte všetky povinné polia" });
+      return res.status(400).json({ error: "Vyplňte všetky povinné polia" });
     }
 
     // Email validation
@@ -62,7 +57,7 @@ export default async function handler(
 
     // Generate PDF
     const pdfBytes = await renderDocument(
-      ApplicationPdf({ data: { ...data, date } })
+      ApplicationPdf({ data: { ...data, date } }),
     );
 
     // Send email via Resend

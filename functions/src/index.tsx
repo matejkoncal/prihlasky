@@ -12,7 +12,7 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 
-const RECIPIENT_EMAIL = "slosarovalucia1@gmail.com";
+const RECIPIENT_EMAIL = "matej@koncal.sk";
 const SENDER_EMAIL = "prihlasky@koncal.sk";
 
 interface FormData {
@@ -31,7 +31,14 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
     const data: FormData = req.body;
 
     // Validate required fields
-    if (!data.name || !data.dateOfBirth || !data.classField || !data.address1 || !data.phone || !data.email) {
+    if (
+      !data.name ||
+      !data.dateOfBirth ||
+      !data.classField ||
+      !data.address1 ||
+      !data.phone ||
+      !data.email
+    ) {
       res.status(400).json({ error: "Vyplňte všetky povinné polia" });
       return;
     }
@@ -48,7 +55,7 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
 
     // Generate PDF
     const pdfBytes = await renderDocument(
-      ApplicationPdf({ data: { ...data, date } })
+      ApplicationPdf({ data: { ...data, date } }),
     );
 
     // Send email via Resend

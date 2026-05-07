@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Container,
   Paper,
@@ -11,16 +11,18 @@ import {
   Divider,
   Link,
   CircularProgress,
-} from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import SendIcon from '@mui/icons-material/Send';
-import SchoolIcon from '@mui/icons-material/School';
+} from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import SendIcon from "@mui/icons-material/Send";
+import sosLogo from "./assets/logos/sos-logo.jpg";
+import erasmusLogo from "./assets/logos/erasmus-logo.jpg";
+import saiacLogo from "./assets/logos/saaic-logo.jpg";
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#1565c0' },
-    background: { default: '#f0f4f8' },
+    primary: { main: "#1565c0" },
+    background: { default: "#f0f4f8" },
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -29,11 +31,11 @@ const theme = createTheme({
 });
 
 const ODBORY = [
-  'Mechanik elektrotechnik',
-  'Mechanik počítačových sietí',
-  'Technik energetických zariadení budov',
-  'Mechanik nastavovač / mechanička nastavovačka',
-  'Mechanik / mechanička strojov a zariadení',
+  "Mechanik elektrotechnik",
+  "Mechanik počítačových sietí",
+  "Technik energetických zariadení budov",
+  "Mechanik nastavovač / mechanička nastavovačka",
+  "Mechanik / mechanička strojov a zariadení",
 ];
 
 interface FormData {
@@ -49,24 +51,24 @@ interface FormData {
 }
 
 const INITIAL_FORM: FormData = {
-  name: '',
-  dateOfBirth: '',
-  trieda: '',
-  odbor: '',
-  address1: '',
-  address2: '',
-  address3: '',
-  phone: '',
-  email: '',
+  name: "",
+  dateOfBirth: "",
+  trieda: "",
+  odbor: "",
+  address1: "",
+  address2: "",
+  address3: "",
+  phone: "",
+  email: "",
 };
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 function App() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -75,7 +77,7 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError('');
+    setError("");
     setSuccess(false);
 
     try {
@@ -84,18 +86,18 @@ function App() {
         classField: `${form.trieda} – ${form.odbor}`,
       };
       const res = await fetch(`${API_URL}/api/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Odoslanie zlyhalo');
+        throw new Error(data.error || "Odoslanie zlyhalo");
       }
       setSuccess(true);
       setForm(INITIAL_FORM);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Neznáma chyba');
+      setError(err instanceof Error ? err.message : "Neznáma chyba");
     } finally {
       setSubmitting(false);
     }
@@ -109,23 +111,18 @@ function App() {
           elevation={0}
           sx={{
             p: { xs: 3, sm: 5 },
-            border: '1px solid',
-            borderColor: 'grey.200',
+            border: "1px solid",
+            borderColor: "grey.200",
           }}
         >
           {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Box sx={{ textAlign: "center", mb: 3 }}>
             <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 1,
-                mb: 1,
-              }}
-            >
-              <SchoolIcon sx={{ color: 'primary.main', fontSize: 28 }} />
-            </Box>
+              component="img"
+              src={sosLogo}
+              alt="SOŠ technológií a remesiel"
+              sx={{ height: 70, mx: "auto", mb: 1, display: "block" }}
+            />
             <Typography
               variant="body2"
               color="primary.main"
@@ -139,37 +136,26 @@ function App() {
 
             <Box
               sx={{
-                display: 'flex',
-                justifyContent: 'center',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 gap: 3,
                 mt: 1.5,
                 mb: 2,
               }}
             >
-              <Typography
-                variant="caption"
-                sx={{
-                  px: 1.5,
-                  py: 0.5,
-                  bgcolor: 'grey.100',
-                  borderRadius: 1,
-                  color: 'text.secondary',
-                }}
-              >
-                [Erasmus+]
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{
-                  px: 1.5,
-                  py: 0.5,
-                  bgcolor: 'grey.100',
-                  borderRadius: 1,
-                  color: 'text.secondary',
-                }}
-              >
-                [SAAIC]
-              </Typography>
+              <Box
+                component="img"
+                src={erasmusLogo}
+                alt="Erasmus+"
+                sx={{ height: 40 }}
+              />
+              <Box
+                component="img"
+                src={saiacLogo}
+                alt="SAAIC"
+                sx={{ height: 40 }}
+              />
             </Box>
           </Box>
 
@@ -179,7 +165,11 @@ function App() {
           <Typography
             variant="h5"
             align="center"
-            sx={{ fontWeight: 700, mb: 0.5, fontSize: { xs: '1.2rem', sm: '1.5rem' } }}
+            sx={{
+              fontWeight: 700,
+              mb: 0.5,
+              fontSize: { xs: "1.2rem", sm: "1.5rem" },
+            }}
           >
             Prihláška do výberového konania na projekt Erasmus+
           </Typography>
@@ -195,7 +185,7 @@ function App() {
             variant="caption"
             align="center"
             color="text.disabled"
-            sx={{ mb: 3, display: 'block' }}
+            sx={{ mb: 3, display: "block" }}
           >
             The Application for the Erasmus+ project in the 2026/2027 school
             year
@@ -215,7 +205,7 @@ function App() {
           <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}
+            sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
           >
             <TextField
               label="Meno a priezvisko / Name and surname"
@@ -237,7 +227,13 @@ function App() {
               onChange={handleChange}
             />
 
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <TextField
                 label="Trieda / Class"
                 name="trieda"
@@ -273,7 +269,13 @@ function App() {
               onChange={handleChange}
             />
 
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <TextField
                 label="PSČ a mesto / ZIP & City"
                 name="address2"
@@ -290,7 +292,13 @@ function App() {
               />
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <TextField
                 label="Telefón / Phone"
                 name="phone"
@@ -313,25 +321,34 @@ function App() {
 
             <Divider sx={{ my: 1 }} />
 
-            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ lineHeight: 1.7 }}
+            >
               Svojím odoslaním potvrdzujem prihlášku do výberového konania na
               projekt Erasmus+.
               <br />
-              <Typography component="span" variant="caption" color="text.disabled">
+              <Typography
+                component="span"
+                variant="caption"
+                color="text.disabled"
+              >
                 I confirm the application for the tender for the Erasmus+
                 project.
               </Typography>
             </Typography>
 
-            <Paper
-              variant="outlined"
-              sx={{ p: 2, bgcolor: 'grey.50' }}
-            >
-              <Typography variant="caption" gutterBottom sx={{ fontWeight: 600, display: 'block' }}>
+            <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{ fontWeight: 600, display: "block" }}
+              >
                 Prílohy v anglickom jazyku / Attachments in English:
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Životopis – Europass –{' '}
+                Životopis – Europass –{" "}
                 <Link
                   href="https://europa.eu/europass/en"
                   target="_blank"
@@ -350,15 +367,21 @@ function App() {
               variant="contained"
               size="large"
               disabled={submitting}
-              endIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+              endIcon={
+                submitting ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <SendIcon />
+                )
+              }
               sx={{
                 py: 1.5,
                 fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '1rem',
+                textTransform: "none",
+                fontSize: "1rem",
               }}
             >
-              {submitting ? 'Odosiela sa...' : 'Odoslať prihlášku'}
+              {submitting ? "Odosiela sa..." : "Odoslať prihlášku"}
             </Button>
           </Box>
 
@@ -366,7 +389,7 @@ function App() {
             variant="caption"
             align="center"
             color="text.disabled"
-            sx={{ mt: 3, display: 'block' }}
+            sx={{ mt: 3, display: "block" }}
           >
             Uvedené informácie sú určené pre interné potreby školy
           </Typography>

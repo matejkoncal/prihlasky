@@ -1,4 +1,4 @@
-import { Document, Page, View, Text } from "@formepdf/react";
+import { Document, Page, View, Text, Image } from "@formepdf/react";
 
 interface ApplicationData {
   name: string;
@@ -58,12 +58,14 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
           style={{
             flexDirection: "row",
             justifyContent: "center",
+            alignItems: "center",
             gap: 40,
             marginBottom: 16,
           }}
         >
-          <Text style={{ fontSize: 9, color: "#666" }}>[Erasmus+]</Text>
-          <Text style={{ fontSize: 9, color: "#666" }}>[SAAIC]</Text>
+          <Image src="./assets/sos-logo.jpg" height={50} />
+          <Image src="./assets/erasmus-logo.jpg" height={35} />
+          <Image src="./assets/saaic-logo.jpg" height={35} />
         </View>
 
         {/* Title */}
@@ -127,9 +129,7 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
         </View>
 
         <View style={row}>
-          <Text style={{ ...label, width: 200 }}>
-            Emailová adresa / email:
-          </Text>
+          <Text style={{ ...label, width: 200 }}>Emailová adresa / email:</Text>
           <Text style={value}>{data.email}</Text>
         </View>
 
@@ -153,9 +153,7 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
           }}
         >
           <View>
-            <Text style={{ fontSize: 10 }}>
-              V Bratislave, dňa: {data.date}
-            </Text>
+            <Text style={{ fontSize: 10 }}>V Bratislave, dňa: {data.date}</Text>
           </View>
           <View>
             <Text style={{ fontSize: 10 }}>
