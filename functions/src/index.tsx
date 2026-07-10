@@ -5,6 +5,10 @@ import cors from "cors";
 import { renderDocument } from "@formepdf/core";
 import { Resend } from "resend";
 import { ApplicationPdf } from "./pdf-template";
+import {
+  type StudentSituation,
+  validateApplicationExtras,
+} from "./application-validation";
 
 const resendApiKey = defineSecret("RESEND_API_KEY");
 
@@ -29,6 +33,8 @@ interface FormData {
   address3: string;
   phone: string;
   email: string;
+  studentSituation: StudentSituation;
+  personalDataConsent: true;
   cv?: FileAttachment;
   motivationLetter?: FileAttachment;
 }
@@ -47,6 +53,12 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
       !data.email
     ) {
       res.status(400).json({ error: "Vyplňte všetky povinné polia" });
+      return;
+    }
+
+    const extrasValidationError = validateApplicationExtras(data);
+    if (extrasValidationError) {
+      res.status(400).json({ error: extrasValidationError });
       return;
     }
 
