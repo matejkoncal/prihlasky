@@ -81,6 +81,7 @@ function App() {
   const [motivationLetter, setMotivationLetter] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,6 +132,7 @@ function App() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Odoslanie zlyhalo");
       }
+      setConfirmationEmail(form.email);
       setSuccess(true);
       setForm(INITIAL_FORM);
       setCv(null);
@@ -243,22 +245,31 @@ function App() {
             year
           </Typography>
 
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
-              Prihláška bola úspešne odoslaná!
-            </Alert>
-          )}
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          {success ? (
+            <Paper
+              variant="outlined"
+              sx={{ p: 4, textAlign: "center", bgcolor: "success.50" }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                Prihláška bola úspešne odoslaná.
+              </Typography>
+              <Typography color="text.secondary">
+                Potvrdenie sme odoslali na e-mailovú adresu {confirmationEmail}.
+              </Typography>
+            </Paper>
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
-          >
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+              >
             <TextField
               label="Meno a priezvisko / Name and surname"
               name="name"
@@ -543,7 +554,9 @@ function App() {
             >
               {submitting ? "Odosiela sa..." : "Odoslať prihlášku"}
             </Button>
-          </Box>
+              </Box>
+            </>
+          )}
 
           <Typography
             variant="caption"
