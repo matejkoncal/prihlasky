@@ -252,7 +252,60 @@ Run `cd functions && npm test -- pdf-template.test.tsx && npm test && npm run bu
 
 ---
 
-### Task 4: Final verification and deployment push
+### Task 4: Official EU co-funding mark
+
+**Files:**
+- Create: `web/src/assets/logos/eu-co-funded-sk.png`
+- Create: `functions/src/assets/eu-co-funded-sk.png`
+- Modify: `web/src/App.test.tsx`
+- Modify: `web/src/App.tsx`
+- Modify: `functions/test/pdf-template.test.tsx`
+- Modify: `functions/src/pdf-template.tsx`
+
+**Interfaces:**
+- Consumes: official archive `https://ec.europa.eu/regional_policy/sources/information-sources/logo-download-center/co-funded_sk.zip` and member `co-funded_SK/horizontal/RGB/PNG/SK_Co-fundedbytheEU_RGB_POS.png`.
+- Produces: accessible web image with alt text `Spolufinancované Európskou úniou` and a centred PNG data URI in the PDF header.
+
+- [ ] **Step 1: Extend tests and verify RED**
+
+In `web/src/App.test.tsx`, add:
+
+```ts
+expect(
+  screen.getByRole("img", { name: "Spolufinancované Európskou úniou" }),
+).toBeTruthy();
+```
+
+In `functions/test/pdf-template.test.tsx`, recursively collect every React element's `src` prop and assert that one starts with `data:image/png;base64,`. Run the focused web and PDF tests; expect both to fail because the co-funding mark is absent.
+
+- [ ] **Step 2: Extract the official positive RGB PNG**
+
+Download `co-funded_sk.zip`, extract only `SK_Co-fundedbytheEU_RGB_POS.png`, and copy the unchanged binary to both exact asset paths above. Verify both copies have identical SHA-256 hashes.
+
+- [ ] **Step 3: Add the web mark**
+
+Import `eu-co-funded-sk.png` in `web/src/App.tsx` and add this centred image directly below the existing Erasmus+/SAAIC logo row:
+
+```tsx
+<Box
+  component="img"
+  src={euCoFundedLogo}
+  alt="Spolufinancované Európskou úniou"
+  sx={{ width: 220, maxWidth: "75%", mx: "auto", mb: 2, display: "block" }}
+/>
+```
+
+- [ ] **Step 4: Add the PDF mark**
+
+Update the PDF image loader to derive `image/png` for `.png` and retain `image/jpeg` for `.jpg`. Load `eu-co-funded-sk.png` and render it in a centred row below the existing three-logo row with width 170 and proportional height. Reduce adjacent vertical spacing only as needed to preserve one A4 page.
+
+- [ ] **Step 5: Verify GREEN and commit**
+
+Run both focused tests, all web/functions tests, web lint, and both builds. Expect exit 0. Commit the official assets, tests, and UI/PDF changes with message `feat: add official EU co-funding mark`.
+
+---
+
+### Task 5: Final verification and deployment push
 
 **Files:**
 - Verify: all committed feature, dependency, test, spec, and plan files.
