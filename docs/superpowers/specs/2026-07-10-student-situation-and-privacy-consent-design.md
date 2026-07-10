@@ -41,7 +41,17 @@ The generated PDF will display:
 - the approved consent wording; and
 - `Súhlas udelený: Áno`.
 
-The notification email body will also show the selected situation and confirm that consent was granted, making the submitted values visible without opening the attachment. Existing attachments and recipient behaviour remain unchanged.
+The notification email body will also show the selected situation and confirm that consent was granted, making the submitted values visible without opening the attachment. Existing attachment behaviour remains unchanged. As separately approved during implementation, notifications will be sent to `matej@koncal.sk` and `koncalova@sostar.sk`.
+
+## EU Co-funding Logo
+
+The web form and generated PDF will use the official Slovak horizontal co-funding mark supplied by the European Commission. The source archive is `co-funded_sk.zip` from the Commission's Download Centre for Visual Elements, and the selected positive RGB PNG is:
+
+`co-funded_SK/horizontal/RGB/PNG/SK_Co-fundedbytheEU_RGB_POS.png`
+
+This ready-to-use asset combines the EU emblem with the complete approved Slovak funding statement `Spolufinancované Európskou úniou`. It will not be redrawn, separated, recoloured, or combined with custom text.
+
+All existing school, Erasmus+, and SAAIC logos remain. On the web, the new mark will be centred in a separate row below the existing Erasmus+ and SAAIC row. In the PDF, it will be centred in a separate row below the existing SOŠ, Erasmus+, and SAAIC row. Its width will preserve the original aspect ratio, keep the funding statement legible, and maintain the PDF as a single A4 page.
 
 ## Error Handling
 
@@ -49,7 +59,7 @@ Requests with a missing or unsupported student situation will receive HTTP 400 w
 
 ## Testing and Verification
 
-Tests will cover the reusable validation rules for the three accepted situation values and the requirement that consent equal `true`. PDF-related types and rendering will be exercised by the existing TypeScript build, and both the web and functions production builds will be run before committing and pushing. The final diff and git status will be checked so unrelated `.DS_Store` files are not committed.
+Tests will cover the reusable validation rules for the three accepted situation values, the requirement that consent equal `true`, the form controls and disabled-submit behaviour, the logo's accessible web presence, and the new PDF content. The web will be rendered in a browser for responsive visual inspection. A representative PDF will be generated, rasterised, and visually checked for a single unclipped A4 page with legible content and logos. Both the web and functions production builds will be run before committing and pushing. The final diff and git status will be checked so unrelated `.DS_Store` files are not committed.
 
 ## Deployment
 
