@@ -9,6 +9,7 @@ import {
   type StudentSituation,
   validateApplicationExtras,
 } from "./application-validation";
+import { createApplicantConfirmationEmail } from "./applicant-confirmation";
 
 const resendApiKey = defineSecret("RESEND_API_KEY");
 
@@ -117,6 +118,12 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
             ]
           : []),
       ],
+    });
+
+    const applicantConfirmation = createApplicantConfirmationEmail(data.email);
+    await resend.emails.send({
+      from: `Erasmus+ Prihlášky <${SENDER_EMAIL}>`,
+      ...applicantConfirmation,
     });
 
     res.status(200).json({ success: true });
