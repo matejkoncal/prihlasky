@@ -8,6 +8,12 @@ it("shows all situations and enables submit only after consent", async () => {
   render(<App />);
 
   expect(
+    screen.getByRole("img", {
+      name: "Spolufinancované Európskou úniou",
+    }),
+  ).toBeTruthy();
+
+  expect(
     screen.getByLabelText("Žiak so zdravotným znevýhodnením"),
   ).toBeTruthy();
   expect(

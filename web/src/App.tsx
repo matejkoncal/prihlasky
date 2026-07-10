@@ -24,6 +24,7 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import sosLogo from "./assets/logos/sos-logo.jpg";
 import erasmusLogo from "./assets/logos/erasmus-logo.jpg";
 import saiacLogo from "./assets/logos/saaic-logo.jpg";
+import euCoFundedLogo from "./assets/logos/eu-co-funded-sk.png";
 
 const theme = createTheme({
   palette: {
@@ -195,6 +196,19 @@ function App() {
                 sx={{ height: 40 }}
               />
             </Box>
+
+            <Box
+              component="img"
+              src={euCoFundedLogo}
+              alt="Spolufinancované Európskou úniou"
+              sx={{
+                width: 220,
+                maxWidth: "75%",
+                mx: "auto",
+                mb: 2,
+                display: "block",
+              }}
+            />
           </Box>
 
           <Divider sx={{ mb: 3 }} />

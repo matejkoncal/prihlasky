@@ -1,16 +1,21 @@
 import { Document, Page, View, Text, Image } from "@formepdf/react";
 import fs from "fs";
 import path from "path";
+import type { StudentSituation } from "./application-validation";
 
 function loadImageAsDataUri(filename: string): string {
   const filePath = path.join(__dirname, "assets", filename);
   const data = fs.readFileSync(filePath);
-  return `data:image/jpeg;base64,${data.toString("base64")}`;
+  const mimeType = path.extname(filename).toLowerCase() === ".png"
+    ? "image/png"
+    : "image/jpeg";
+  return `data:${mimeType};base64,${data.toString("base64")}`;
 }
 
 const sosLogo = loadImageAsDataUri("sos-logo.jpg");
 const erasmusLogo = loadImageAsDataUri("erasmus-logo.jpg");
 const saicLogo = loadImageAsDataUri("saaic-logo.jpg");
+const euCoFundedLogo = loadImageAsDataUri("eu-co-funded-sk.png");
 
 interface ApplicationData {
   name: string;
@@ -22,6 +27,8 @@ interface ApplicationData {
   phone: string;
   email: string;
   date: string;
+  studentSituation: StudentSituation;
+  personalDataConsent: true;
 }
 
 const label = {
@@ -72,12 +79,23 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
             justifyContent: "center",
             alignItems: "center",
             gap: 40,
-            marginBottom: 16,
+            marginBottom: 6,
           }}
         >
           <Image src={sosLogo} height={50} />
           <Image src={erasmusLogo} height={35} />
           <Image src={saicLogo} height={35} />
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 12,
+          }}
+        >
+          <Image src={euCoFundedLogo} width={170} />
         </View>
 
         {/* Title */}
@@ -145,8 +163,30 @@ export function ApplicationPdf(props: { data: ApplicationData }) {
           <Text style={value}>{data.email}</Text>
         </View>
 
+        <View style={row}>
+          <Text style={{ ...label, width: 200 }}>Situácia žiaka:</Text>
+          <Text style={value}>{data.studentSituation}</Text>
+        </View>
+
+        <View
+          style={{
+            marginTop: 6,
+            padding: 10,
+            borderWidth: 1,
+            borderColor: "#bbb",
+          }}
+        >
+          <Text style={{ fontSize: 9, lineHeight: 1.4, color: "#333" }}>
+            Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške
+            na účely výberového konania projektu Erasmus+.
+          </Text>
+          <Text style={{ fontSize: 10, fontWeight: "bold", marginTop: 5 }}>
+            Súhlas udelený: Áno
+          </Text>
+        </View>
+
         {/* Footer */}
-        <View style={{ marginTop: 60, textAlign: "center" }}>
+        <View style={{ marginTop: 20, textAlign: "center" }}>
           <Text style={{ fontSize: 9, color: "#999" }}>
             Uvedené informácie sú určené pre interné potreby školy
           </Text>

@@ -16,7 +16,7 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "10mb" }));
 
-const RECIPIENT_EMAILS = ["matej@koncal.sk", "slosarovalucia1@gmail.com"];
+const RECIPIENT_EMAILS = ["matej@koncal.sk", "koncalova@sostar.sk"];
 const SENDER_EMAIL = "prihlasky@koncal.sk";
 
 interface FileAttachment {
@@ -91,6 +91,8 @@ app.post("/api/submit", async (req: express.Request, res: express.Response) => {
         <p><strong>Adresa:</strong> ${escapeHtml(data.address1)} ${escapeHtml(data.address2 || "")} ${escapeHtml(data.address3 || "")}</p>
         <p><strong>Telefón:</strong> ${escapeHtml(data.phone)}</p>
         <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+        <p><strong>Situácia žiaka:</strong> ${escapeHtml(data.studentSituation)}</p>
+        <p><strong>Súhlas so spracovaním osobných údajov:</strong> Áno</p>
         <p><em>PDF prihláška je v prílohe.</em></p>
       `,
       attachments: [
