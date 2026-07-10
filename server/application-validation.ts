@@ -13,6 +13,7 @@ export const MAX_ATTACHMENTS_SIZE = 3 * 1024 * 1024;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BASE64_PATTERN = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 const ALLOWED_ATTACHMENT_PATTERN = /\.(pdf|docx)$/i;
+const UNSAFE_ATTACHMENT_NAME_PATTERN = /[/\\\u0000-\u001f\u007f]/;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return (
@@ -45,6 +46,12 @@ function parseAttachment(
   }
 
   const name = requiredString(value.name);
+  if (
+    name &&
+    (name.length > 200 || UNSAFE_ATTACHMENT_NAME_PATTERN.test(name))
+  ) {
+    return { decodedSize: 0, error: "Neplatný názov prílohy" };
+  }
   if (!name || !ALLOWED_ATTACHMENT_PATTERN.test(name)) {
     return {
       decodedSize: 0,

@@ -49,4 +49,11 @@ describe("application emails", () => {
       ),
     });
   });
+
+  it("removes line breaks from the email subject", () => {
+    const data = { ...application(), name: "Ján\r\nBcc: attacker@example.com" };
+    expect(createSchoolEmail(data, "cGRm").subject).toBe(
+      "Nová prihláška Erasmus+ - Ján Bcc: attacker@example.com",
+    );
+  });
 });

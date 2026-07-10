@@ -78,6 +78,18 @@ describe("validateApplication", () => {
     });
   });
 
+  it("rejects unsafe attachment filenames", () => {
+    expect(
+      validateApplication({
+        ...validPayload(),
+        cv: { name: "../cv.pdf", content: Buffer.from("test").toString("base64") },
+      }),
+    ).toEqual({
+      success: false,
+      error: "Neplatný názov prílohy",
+    });
+  });
+
   it("rejects malformed base64 attachments", () => {
     expect(
       validateApplication({

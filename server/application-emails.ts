@@ -38,6 +38,10 @@ function pdfFilename(name: string): string {
   return `prihlaska-erasmus-${safeName || "ziak"}.pdf`;
 }
 
+function emailSubjectName(name: string): string {
+  return name.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
 export function createSchoolEmail(
   data: ValidatedApplication,
   pdfBase64: string,
@@ -52,7 +56,7 @@ export function createSchoolEmail(
 
   return {
     to: RECIPIENT_EMAILS,
-    subject: `Nová prihláška Erasmus+ - ${data.name}`,
+    subject: `Nová prihláška Erasmus+ - ${emailSubjectName(data.name)}`,
     html: `
       <h2>Nová prihláška do výberového konania Erasmus+ 2026/2027</h2>
       <p><strong>Meno:</strong> ${escapeHtml(data.name)}</p>
