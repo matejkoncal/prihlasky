@@ -1,5 +1,10 @@
 import { renderDocument } from "@formepdf/core";
 import { Resend } from "resend";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import {
+  createApplicationRepository,
+  type ApplicationStoreClient,
+} from "@/server/application-repository";
 import {
   SENDER_EMAIL,
   type EmailMessage,
@@ -23,6 +28,9 @@ export const createProductionDependencies: DependenciesFactory = (apiKey) => {
   const resend = new Resend(apiKey);
 
   return {
+    applications: createApplicationRepository(
+      createAdminSupabaseClient() as unknown as ApplicationStoreClient,
+    ),
     now: () => new Date(),
     renderPdf: async (data) => renderDocument(ApplicationPdf({ data })),
     sendEmail: async (message: EmailMessage) => {

@@ -2,6 +2,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import type { EmailMessage } from "./application-emails";
+import type { ApplicationRepository } from "./application-repository";
 import type { PdfApplicationData } from "./application-types";
 import {
   submitApplication,
@@ -32,12 +33,25 @@ function dependencies() {
   const sendEmail = vi.fn(async (message: EmailMessage) => {
     events.push(`email:${Array.isArray(message.to) ? "school" : message.to}`);
   });
+  const applications: ApplicationRepository = {
+    createPending: vi.fn(async () => {
+      events.push("application:pending");
+      return { id: "application-id" };
+    }),
+    markSent: vi.fn(async () => {
+      events.push("application:sent");
+    }),
+    markFailed: vi.fn(async () => {
+      events.push("application:failed");
+    }),
+  };
   const value: SubmissionDependencies = {
     now: () => new Date(2026, 6, 10),
     renderPdf,
     sendEmail,
+    applications,
   };
-  return { value, events, renderPdf, sendEmail };
+  return { value, events, renderPdf, sendEmail, applications };
 }
 
 describe("submitApplication", () => {
@@ -57,9 +71,11 @@ describe("submitApplication", () => {
       success: true,
     });
     expect(deps.events).toEqual([
+      "application:pending",
       "render:10.7.2026",
       "email:school",
       "email:jan@example.com",
+      "application:sent",
     ]);
     expect(deps.sendEmail.mock.calls[0][0].attachments?.[0]).toEqual(
       expect.objectContaining({ content: Buffer.from("pdf").toString("base64") }),
@@ -74,6 +90,10 @@ describe("submitApplication", () => {
       .mockRejectedValueOnce(new Error("delivery failed"));
     await expect(submitApplication(validPayload(), deps.value)).rejects.toThrow(
       "delivery failed",
+    );
+    expect(deps.applications.markFailed).toHaveBeenCalledWith(
+      "application-id",
+      expect.objectContaining({ message: "delivery failed" }),
     );
   });
 });

@@ -7,3 +7,6 @@ node_modules/
 firebase-debug.log*
 dist/
 lib/
+!lib/
+!lib/supabase/
+!lib/supabase/*.ts

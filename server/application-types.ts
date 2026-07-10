@@ -30,6 +30,20 @@ export interface PdfApplicationData extends ValidatedApplication {
   date: string;
 }
 
+export interface StoredApplicationPayload {
+  applicantName: string;
+  formData: Omit<ValidatedApplication, "cv" | "motivationLetter">;
+}
+
+export function toStoredApplicationPayload(
+  data: ValidatedApplication,
+): StoredApplicationPayload {
+  const { cv, motivationLetter, ...formData } = data;
+  void cv;
+  void motivationLetter;
+  return { applicantName: data.name, formData };
+}
+
 export type ValidationResult =
   | { success: true; data: ValidatedApplication }
   | { success: false; error: string };

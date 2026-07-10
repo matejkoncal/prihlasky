@@ -2,6 +2,7 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SubmissionDependencies } from "@/server/submit-application";
+import type { ApplicationRepository } from "@/server/application-repository";
 import { createSubmitRoute } from "./route";
 
 function validPayload() {
@@ -28,7 +29,13 @@ function request(body: string) {
 }
 
 function fakeDependencies(sendEmail = vi.fn(async () => undefined)) {
+  const applications: ApplicationRepository = {
+    createPending: vi.fn(async () => ({ id: "application-id" })),
+    markSent: vi.fn(async () => undefined),
+    markFailed: vi.fn(async () => undefined),
+  };
   return {
+    applications,
     now: () => new Date(2026, 6, 10),
     renderPdf: vi.fn(async () => new Uint8Array(Buffer.from("pdf"))),
     sendEmail,

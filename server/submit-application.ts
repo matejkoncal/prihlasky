@@ -1,12 +1,17 @@
 import type { EmailMessage } from "./application-emails";
+import type { ApplicationRepository } from "./application-repository";
 import {
   createApplicantConfirmationEmail,
   createSchoolEmail,
 } from "./application-emails";
-import type { PdfApplicationData } from "./application-types";
+import {
+  toStoredApplicationPayload,
+  type PdfApplicationData,
+} from "./application-types";
 import { validateApplication } from "./application-validation";
 
 export interface SubmissionDependencies {
+  applications: ApplicationRepository;
   now: () => Date;
   renderPdf: (data: PdfApplicationData) => Promise<Uint8Array>;
   sendEmail: (message: EmailMessage) => Promise<void>;
@@ -27,17 +32,29 @@ export async function submitApplication(
   const validation = validateApplication(input);
   if (!validation.success) return validation;
 
-  const pdfData: PdfApplicationData = {
-    ...validation.data,
-    date: formatDate(dependencies.now()),
-  };
-  const pdfBytes = await dependencies.renderPdf(pdfData);
-  const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
-
-  await dependencies.sendEmail(createSchoolEmail(validation.data, pdfBase64));
-  await dependencies.sendEmail(
-    createApplicantConfirmationEmail(validation.data.email),
+  const application = await dependencies.applications.createPending(
+    toStoredApplicationPayload(validation.data),
   );
 
-  return { success: true };
+  try {
+    const pdfData: PdfApplicationData = {
+      ...validation.data,
+      date: formatDate(dependencies.now()),
+    };
+    const pdfBytes = await dependencies.renderPdf(pdfData);
+    const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
+
+    await dependencies.sendEmail(createSchoolEmail(validation.data, pdfBase64));
+    await dependencies.sendEmail(
+      createApplicantConfirmationEmail(validation.data.email),
+    );
+    await dependencies.applications.markSent(application.id);
+
+    return { success: true };
+  } catch (error) {
+    const failure =
+      error instanceof Error ? error : new Error("Unknown delivery failure");
+    await dependencies.applications.markFailed(application.id, failure).catch(() => undefined);
+    throw failure;
+  }
 }

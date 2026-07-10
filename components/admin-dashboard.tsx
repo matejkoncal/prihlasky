@@ -1,0 +1,14 @@
+"use client";
+
+import { useState } from "react";
+import { Alert, Box, Button, Container, MenuItem, Paper, Select, Typography } from "@mui/material";
+import { assignReviewer, removeAssignment } from "@/app/admin/actions";
+
+export interface AdminReviewer { id: string; email: string; display_name: string | null; pending_count: number; completed_count: number; }
+interface Category { id: string; name: string; assignment_id: string | null; reviewer_name: string | null; reviewer_email: string | null; status: "pending" | "completed" | null; score: number | null; comment: string | null; submitted_at: string | null; }
+export interface AdminApplication { id: string; applicant_name: string; submitted_at: string; categories: Category[]; }
+
+export function AdminDashboard({ applications, reviewers }: { applications: AdminApplication[]; reviewers: AdminReviewer[] }) {
+  const [error, setError] = useState("");
+  return <Container maxWidth="lg" sx={{ py: 4 }}><Typography variant="h4" gutterBottom>Hodnotenie prihlášok</Typography>{error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}{applications.length === 0 && <Typography>Zatiaľ nie sú žiadne prihlášky pripravené na hodnotenie.</Typography>}{applications.map((application) => <Paper key={application.id} sx={{ p: 3, mb: 3 }}><Typography variant="h6">{application.applicant_name}</Typography>{application.categories.map((category) => <Box key={category.id} sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1, py: 1, borderBottom: "1px solid", borderColor: "divider" }}><Typography sx={{ minWidth: 140, fontWeight: 700 }}>{category.name}</Typography>{category.status === "completed" ? <Typography>Hotovo: {category.reviewer_name ?? category.reviewer_email}, {category.score}/10 — {category.comment || "bez komentára"}</Typography> : category.assignment_id ? <><Typography>Čaká na: {category.reviewer_name ?? category.reviewer_email}</Typography><Box component="form" action={async (formData) => { try { await removeAssignment(formData); } catch { setError("Priradenie sa nedá odstrániť"); } }}><input type="hidden" name="assignmentId" value={category.assignment_id} /><Button type="submit" size="small" color="error">Odobrať</Button></Box></> : <Box component="form" action={async (formData) => { try { await assignReviewer(formData); } catch { setError("Priradenie sa nepodarilo vytvoriť"); } }} sx={{ display: "flex", gap: 1 }}><input type="hidden" name="applicationId" value={application.id} /><input type="hidden" name="categoryId" value={category.id} /><Select name="reviewerId" size="small" required displayEmpty defaultValue=""><MenuItem value="" disabled>Vyberte hodnotiteľa</MenuItem>{reviewers.map((reviewer) => <MenuItem key={reviewer.id} value={reviewer.id}>{reviewer.display_name || reviewer.email}</MenuItem>)}</Select><Button type="submit" size="small" variant="contained">Priradiť</Button></Box>}</Box>)}</Paper>)}</Container>;
+}
