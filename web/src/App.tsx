@@ -10,6 +10,12 @@ import {
   Box,
   Divider,
   CircularProgress,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -48,6 +54,8 @@ interface FormData {
   address3: string;
   phone: string;
   email: string;
+  studentSituation: string;
+  personalDataConsent: boolean;
 }
 
 const INITIAL_FORM: FormData = {
@@ -60,6 +68,8 @@ const INITIAL_FORM: FormData = {
   address3: "",
   phone: "",
   email: "",
+  studentSituation: "",
+  personalDataConsent: false,
 };
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -73,7 +83,11 @@ function App() {
   const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, type, value, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const fileToBase64 = (file: File): Promise<string> =>
@@ -343,6 +357,63 @@ function App() {
               />
             </Box>
 
+            <FormControl required>
+              <FormLabel id="student-situation-label">
+                Vyberte možnosť, ktorá najlepšie vystihuje Vašu situáciu:
+              </FormLabel>
+              <RadioGroup
+                aria-labelledby="student-situation-label"
+                name="studentSituation"
+                value={form.studentSituation}
+                onChange={handleChange}
+              >
+                <FormControlLabel
+                  value="Žiak so zdravotným znevýhodnením"
+                  control={
+                    <Radio
+                      required
+                      slotProps={{
+                        input: {
+                          "aria-label": "Žiak so zdravotným znevýhodnením",
+                        },
+                      }}
+                    />
+                  }
+                  label="Žiak so zdravotným znevýhodnením"
+                />
+                <FormControlLabel
+                  value="Žiak zo sociálne znevýhodneného prostredia"
+                  control={
+                    <Radio
+                      required
+                      slotProps={{
+                        input: {
+                          "aria-label":
+                            "Žiak zo sociálne znevýhodneného prostredia",
+                        },
+                      }}
+                    />
+                  }
+                  label="Žiak zo sociálne znevýhodneného prostredia"
+                />
+                <FormControlLabel
+                  value="Nepatrím do žiadnej z uvedených skupín"
+                  control={
+                    <Radio
+                      required
+                      slotProps={{
+                        input: {
+                          "aria-label":
+                            "Nepatrím do žiadnej z uvedených skupín",
+                        },
+                      }}
+                    />
+                  }
+                  label="Nepatrím do žiadnej z uvedených skupín"
+                />
+              </RadioGroup>
+            </FormControl>
+
             <Divider sx={{ my: 1 }} />
 
             <Typography
@@ -362,6 +433,26 @@ function App() {
                 project.
               </Typography>
             </Typography>
+
+            <FormControlLabel
+              required
+              control={
+                <Checkbox
+                  name="personalDataConsent"
+                  checked={form.personalDataConsent}
+                  onChange={handleChange}
+                  required
+                  slotProps={{
+                    input: {
+                      "aria-label":
+                        "Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške na účely výberového konania projektu Erasmus+.",
+                    },
+                  }}
+                />
+              }
+              label="Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške na účely výberového konania projektu Erasmus+."
+              sx={{ alignItems: "flex-start" }}
+            />
 
             <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
               <Typography
@@ -421,7 +512,7 @@ function App() {
               type="submit"
               variant="contained"
               size="large"
-              disabled={submitting}
+              disabled={submitting || !form.personalDataConsent}
               endIcon={
                 submitting ? (
                   <CircularProgress size={20} color="inherit" />
