@@ -14,7 +14,7 @@ export async function inviteReviewer(formData: FormData): Promise<{ error?: stri
   if (user?.role !== "admin") return { error: "Nemáte oprávnenie správcu" };
   if (role !== "reviewer" && role !== "admin") return { error: "Vyberte rolu používateľa" };
   const origin = (await headers()).get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const { data, error } = await createAdminSupabaseClient().auth.admin.inviteUserByEmail(email, { data: { display_name: displayName.trim() }, redirectTo: new URL("/auth/confirm", origin).toString() });
+  const { data, error } = await createAdminSupabaseClient().auth.admin.inviteUserByEmail(email, { data: { display_name: displayName.trim() }, redirectTo: new URL("/accept-invite", origin).toString() });
   if (error) {
     console.error("Reviewer invitation failed:", error.message);
     return { error: error.message.includes("rate limit") ? "Supabase dočasne obmedzil odosielanie e-mailov. Skúste to o niekoľko minút." : "Pozvánku sa nepodarilo odoslať. Používateľ už možno existuje." };
