@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
       "./public/logos/*",
       "./node_modules/@formepdf/core/pkg/*.wasm",
     ],
+    "/admin/prihlasky/*/hodnotenie.pdf": [
+      "./public/logos/*",
+      "./node_modules/@formepdf/core/pkg/*.wasm",
+    ],
   },
   turbopack: {
     root: process.cwd(),

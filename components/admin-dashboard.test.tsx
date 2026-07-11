@@ -60,7 +60,11 @@ describe("AdminDashboard", () => {
     render(<AdminDashboard applications={applications} reviewers={reviewers} />);
 
     expect(screen.queryByText("Kategória 1")).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
+    const detailToggle = screen.getByRole("button", { name: "Zobraziť detail prihlášky Ján Žiak" });
+    expect(detailToggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText("Zobraziť detail")).not.toBeInTheDocument();
+    await user.click(detailToggle);
+    expect(screen.getByRole("button", { name: "Skryť detail prihlášky Ján Žiak" })).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText("Kategória 1")).toBeInTheDocument();
   });
 
@@ -100,7 +104,7 @@ describe("AdminDashboard", () => {
     expect(screen.getByText("Skóre 35/50")).toBeInTheDocument();
     expect(screen.getByText("Kritérium splnené")).toBeInTheDocument();
     expect(screen.getByText("Hodnotenie dokončené")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Exportovať hodnotenie PDF" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Exportovať hodnotenie PDF/ })).toHaveAttribute(
       "href",
       "/admin/prihlasky/66666666-6666-6666-6666-666666666666/hodnotenie.pdf",
     );
@@ -130,7 +134,7 @@ describe("AdminDashboard", () => {
       evaluatedApplication([8, 7, 6, null, null], 3),
     ]} reviewers={reviewers} />);
 
-    expect(screen.queryByRole("link", { name: "Exportovať hodnotenie PDF" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Exportovať hodnotenie PDF/ })).not.toBeInTheDocument();
   });
 
   it("shows partial progress without marking an unfinished result as failed", () => {

@@ -12,11 +12,13 @@ import {
   CircularProgress,
   Collapse,
   Container,
+  IconButton,
   MenuItem,
   Paper,
   Select,
   Snackbar,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { assignReviewer, removeAssignment } from "@/app/admin/actions";
@@ -121,40 +123,43 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
           const expanded = expandedId === application.id;
           return (
             <Paper key={application.id} variant="outlined" sx={{ borderRadius: 3, overflow: "hidden", borderColor: expanded ? "primary.main" : "divider" }}>
-              <Box sx={{ p: { xs: 2, md: 2.5 }, display: "flex", alignItems: { xs: "flex-start", md: "center" }, flexDirection: { xs: "column", md: "row" }, gap: 2 }}>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 750 }}>{application.applicant_name}</Typography>
+              <Box sx={{ p: { xs: 2, md: 2.5 }, display: "grid", gridTemplateColumns: { xs: "1fr auto", md: "minmax(220px, 1fr) auto auto" }, alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="h6" noWrap sx={{ fontWeight: 750 }}>{application.applicant_name}</Typography>
                   <Typography variant="body2" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
                 </Box>
-                <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
+                <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", justifyContent: { xs: "flex-start", md: "flex-end" }, gridColumn: { xs: "1 / -1", md: "auto" }, gridRow: { xs: 2, md: 1 } }}>
                   <Chip size="small" label={`Skóre ${summary.totalScore}/${summary.maximumScore}`} variant="outlined" />
                   {summary.criterion === "met" && <Chip size="small" label="Kritérium splnené" color="success" />}
                   {summary.criterion === "not-met" && <Chip size="small" label="Kritérium nesplnené" color="error" />}
                   <Chip size="small" label={`Pridelené ${assigned}/${application.categories.length}`} color={assigned === application.categories.length ? "primary" : "default"} />
                   <Chip size="small" label={summary.isComplete ? "Hodnotenie dokončené" : `Hotové ${summary.completedCount}/${summary.categoryCount}`} color={summary.isComplete ? "success" : "default"} />
                 </Stack>
-                {summary.isComplete && summary.categoryCount === 5 && (
-                  <Button
-                    component="a"
-                    href={`/admin/prihlasky/${application.id}/hodnotenie.pdf`}
-                    variant="outlined"
-                    color="success"
-                    size="small"
-                    startIcon={<PictureAsPdfOutlinedIcon />}
-                    sx={{ alignSelf: { xs: "stretch", md: "center" }, whiteSpace: "nowrap" }}
-                  >
-                    Exportovať hodnotenie PDF
-                  </Button>
-                )}
-                <Button
-                  variant={expanded ? "contained" : "outlined"}
-                  endIcon={<ExpandMoreIcon sx={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform .2s" }} />}
-                  aria-expanded={expanded}
-                  onClick={() => setExpandedId(expanded ? null : application.id)}
-                  sx={{ alignSelf: { xs: "stretch", md: "center" } }}
-                >
-                  {expanded ? "Skryť detail" : "Zobraziť detail"}
-                </Button>
+                <Stack direction="row" spacing={.5} sx={{ justifySelf: "end", gridColumn: { xs: 2, md: 3 }, gridRow: 1 }}>
+                  {summary.isComplete && summary.categoryCount === 5 && (
+                    <Tooltip title="Exportovať hodnotenie PDF">
+                      <IconButton
+                        component="a"
+                        href={`/admin/prihlasky/${application.id}/hodnotenie.pdf`}
+                        color="success"
+                        aria-label={`Exportovať hodnotenie PDF pre ${application.applicant_name}`}
+                      >
+                        <PictureAsPdfOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  <Tooltip title={expanded ? "Skryť detail" : "Zobraziť detail"}>
+                    <IconButton
+                      color="primary"
+                      aria-label={`${expanded ? "Skryť" : "Zobraziť"} detail prihlášky ${application.applicant_name}`}
+                      aria-expanded={expanded}
+                      onClick={() => setExpandedId(expanded ? null : application.id)}
+                      sx={{ border: "1px solid", borderColor: expanded ? "primary.main" : "divider", bgcolor: expanded ? "rgba(25, 118, 210, .08)" : "transparent" }}
+                    >
+                      <ExpandMoreIcon sx={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Box>
 
               <Collapse in={expanded} unmountOnExit>
