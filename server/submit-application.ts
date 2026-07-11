@@ -1,5 +1,6 @@
 import type { EmailMessage } from "./application-emails";
 import type { ApplicationRepository } from "./application-repository";
+import type { ApplicationAttachmentRepository } from "./application-attachment-repository";
 import {
   createApplicantConfirmationEmail,
   createSchoolEmail,
@@ -12,6 +13,7 @@ import { validateApplication } from "./application-validation";
 
 export interface SubmissionDependencies {
   applications: ApplicationRepository;
+  attachments: ApplicationAttachmentRepository;
   now: () => Date;
   renderPdf: (data: PdfApplicationData) => Promise<Uint8Array>;
   sendEmail: (message: EmailMessage) => Promise<void>;
@@ -37,6 +39,7 @@ export async function submitApplication(
   );
 
   try {
+    await dependencies.attachments.store(application.id, validation.data);
     const pdfData: PdfApplicationData = {
       ...validation.data,
       date: formatDate(dependencies.now()),
@@ -54,6 +57,7 @@ export async function submitApplication(
   } catch (error) {
     const failure =
       error instanceof Error ? error : new Error("Unknown delivery failure");
+    await dependencies.attachments.removeAll(application.id).catch(() => undefined);
     await dependencies.applications.markFailed(application.id, failure).catch(() => undefined);
     throw failure;
   }

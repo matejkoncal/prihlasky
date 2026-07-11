@@ -91,6 +91,12 @@ describe("ApplicationForm", () => {
         expect.objectContaining({ method: "POST" }),
       );
     });
+    const requestBody = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(requestBody).toEqual(expect.objectContaining({
+      className: "3.A",
+      fieldOfStudy: "Mechanik elektrotechnik",
+      classField: "3.A – Mechanik elektrotechnik",
+    }));
     expect(
       await screen.findByText("Prihláška bola úspešne odoslaná."),
     ).toBeInTheDocument();

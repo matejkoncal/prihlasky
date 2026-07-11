@@ -27,8 +27,27 @@ describe("validateApplication", () => {
       success: true,
       data: expect.objectContaining({
         name: "Ján Žiak",
+        className: "3.A",
+        fieldOfStudy: "Mechanik elektrotechnik",
         address2: "821 01 Bratislava",
         personalDataConsent: true,
+      }),
+    });
+  });
+
+  it("prefers separately submitted class and field values", () => {
+    const result = validateApplication({
+      ...validPayload(),
+      className: " 4.B ",
+      fieldOfStudy: " Autoopravár - mechanik ",
+    });
+
+    expect(result).toEqual({
+      success: true,
+      data: expect.objectContaining({
+        className: "4.B",
+        fieldOfStudy: "Autoopravár - mechanik",
+        classField: "4.B – Autoopravár - mechanik",
       }),
     });
   });

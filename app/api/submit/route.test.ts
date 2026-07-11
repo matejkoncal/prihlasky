@@ -3,6 +3,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SubmissionDependencies } from "@/server/submit-application";
 import type { ApplicationRepository } from "@/server/application-repository";
+import type { ApplicationAttachmentRepository } from "@/server/application-attachment-repository";
 import { createSubmitRoute } from "./route";
 
 function validPayload() {
@@ -34,8 +35,13 @@ function fakeDependencies(sendEmail = vi.fn(async () => undefined)) {
     markSent: vi.fn(async () => undefined),
     markFailed: vi.fn(async () => undefined),
   };
+  const attachments: ApplicationAttachmentRepository = {
+    store: vi.fn(async () => undefined),
+    removeAll: vi.fn(async () => undefined),
+  };
   return {
     applications,
+    attachments,
     now: () => new Date(2026, 6, 10),
     renderPdf: vi.fn(async () => new Uint8Array(Buffer.from("pdf"))),
     sendEmail,

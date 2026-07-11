@@ -6,6 +6,10 @@ import {
   type ApplicationStoreClient,
 } from "@/server/application-repository";
 import {
+  createApplicationAttachmentRepository,
+  type AttachmentClient,
+} from "@/server/application-attachment-repository";
+import {
   SENDER_EMAIL,
   type EmailMessage,
 } from "@/server/application-emails";
@@ -26,10 +30,14 @@ export type DependenciesFactory = (
 export const createProductionDependencies: DependenciesFactory = (apiKey) => {
   if (!apiKey) throw new Error("Missing RESEND_API_KEY");
   const resend = new Resend(apiKey);
+  const supabase = createAdminSupabaseClient();
 
   return {
     applications: createApplicationRepository(
-      createAdminSupabaseClient() as unknown as ApplicationStoreClient,
+      supabase as unknown as ApplicationStoreClient,
+    ),
+    attachments: createApplicationAttachmentRepository(
+      supabase as unknown as AttachmentClient,
     ),
     now: () => new Date(),
     renderPdf: async (data) => renderDocument(ApplicationPdf({ data })),

@@ -6,6 +6,8 @@ describe("toStoredApplicationPayload", () => {
     const payload = toStoredApplicationPayload({
       name: "Ján Žiak",
       dateOfBirth: "2008-01-01",
+      className: "3.A",
+      fieldOfStudy: "Mechanik elektrotechnik",
       classField: "3.A",
       address1: "Školská 1",
       address2: "",

@@ -14,6 +14,8 @@ export interface FileAttachment {
 export interface ValidatedApplication {
   name: string;
   dateOfBirth: string;
+  className: string;
+  fieldOfStudy: string;
   classField: string;
   address1: string;
   address2: string;

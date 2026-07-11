@@ -3,6 +3,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { EmailMessage } from "./application-emails";
 import type { ApplicationRepository } from "./application-repository";
+import type { ApplicationAttachmentRepository } from "./application-attachment-repository";
 import type { PdfApplicationData } from "./application-types";
 import {
   submitApplication,
@@ -45,13 +46,22 @@ function dependencies() {
       events.push("application:failed");
     }),
   };
+  const attachments: ApplicationAttachmentRepository = {
+    store: vi.fn(async () => {
+      events.push("attachments:store");
+    }),
+    removeAll: vi.fn(async () => {
+      events.push("attachments:remove");
+    }),
+  };
   const value: SubmissionDependencies = {
     now: () => new Date(2026, 6, 10),
     renderPdf,
     sendEmail,
     applications,
+    attachments,
   };
-  return { value, events, renderPdf, sendEmail, applications };
+  return { value, events, renderPdf, sendEmail, applications, attachments };
 }
 
 describe("submitApplication", () => {
@@ -72,6 +82,7 @@ describe("submitApplication", () => {
     });
     expect(deps.events).toEqual([
       "application:pending",
+      "attachments:store",
       "render:10.7.2026",
       "email:school",
       "email:jan@example.com",
@@ -95,5 +106,21 @@ describe("submitApplication", () => {
       "application-id",
       expect.objectContaining({ message: "delivery failed" }),
     );
+    expect(deps.attachments.removeAll).toHaveBeenCalledWith("application-id");
+    expect(deps.events).toContain("attachments:remove");
+  });
+
+  it("cleans up and marks the application failed when attachment storage fails", async () => {
+    const deps = dependencies();
+    vi.mocked(deps.attachments.store).mockRejectedValueOnce(new Error("storage failed"));
+
+    await expect(submitApplication(validPayload(), deps.value)).rejects.toThrow("storage failed");
+
+    expect(deps.attachments.removeAll).toHaveBeenCalledWith("application-id");
+    expect(deps.applications.markFailed).toHaveBeenCalledWith(
+      "application-id",
+      expect.objectContaining({ message: "storage failed" }),
+    );
+    expect(deps.renderPdf).not.toHaveBeenCalled();
   });
 });

@@ -118,6 +118,8 @@ function ApplicationForm() {
 
       const payload: Record<string, unknown> = {
         ...form,
+        className: form.trieda,
+        fieldOfStudy: form.odbor,
         classField: `${form.trieda} – ${form.odbor}`,
       };
       if (cv) {

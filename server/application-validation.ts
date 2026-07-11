@@ -87,12 +87,29 @@ export function validateApplication(input: unknown): ValidationResult {
 
   const name = requiredString(input.name);
   const dateOfBirth = requiredString(input.dateOfBirth);
-  const classField = requiredString(input.classField);
+  const submittedClassName = requiredString(input.className);
+  const submittedFieldOfStudy = requiredString(input.fieldOfStudy);
+  const submittedClassField = requiredString(input.classField);
+  const separator = " – ";
+  const separatorIndex = submittedClassField?.indexOf(separator) ?? -1;
+  const className = submittedClassName ?? (
+    separatorIndex >= 0
+      ? submittedClassField!.slice(0, separatorIndex).trim()
+      : submittedClassField
+  );
+  const fieldOfStudy = submittedFieldOfStudy ?? (
+    separatorIndex >= 0
+      ? submittedClassField!.slice(separatorIndex + separator.length).trim()
+      : ""
+  );
+  const classField = submittedClassName && submittedFieldOfStudy
+    ? `${submittedClassName}${separator}${submittedFieldOfStudy}`
+    : submittedClassField;
   const address1 = requiredString(input.address1);
   const phone = requiredString(input.phone);
   const email = requiredString(input.email);
 
-  if (!name || !dateOfBirth || !classField || !address1 || !phone || !email) {
+  if (!name || !dateOfBirth || !className || !classField || !address1 || !phone || !email) {
     return { success: false, error: "Vyplňte všetky povinné polia" };
   }
 
@@ -132,6 +149,8 @@ export function validateApplication(input: unknown): ValidationResult {
   const data: ValidatedApplication = {
     name,
     dateOfBirth,
+    className,
+    fieldOfStudy,
     classField,
     address1,
     address2: optionalString(input.address2),
