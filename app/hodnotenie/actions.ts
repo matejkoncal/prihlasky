@@ -13,7 +13,7 @@ export async function submitEvaluation(formData: FormData) {
   if (typeof comment !== "string") throw new Error("Neplatný komentár");
   const supabase = await createServerSupabaseClient();
   const user = await getVerifiedStaffUser(supabase as unknown as StaffAuthClient);
-  if (user?.role !== "reviewer") throw new Error("Nemáte oprávnenie hodnotiť");
+  if (!user) throw new Error("Nemáte oprávnenie hodnotiť");
   const { error } = await supabase.rpc("submit_evaluation", {
     p_assignment_id: assignmentId,
     p_score: score,

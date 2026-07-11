@@ -35,9 +35,11 @@ describe("StaffLayout", () => {
     const { rerender } = render(<StaffLayout role="admin"><div>Obsah</div></StaffLayout>);
     expect(screen.getByRole("link", { name: "Prihlášky" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Používatelia" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Moje hodnotenia" })).toBeInTheDocument();
 
     rerender(<StaffLayout role="reviewer"><div>Obsah</div></StaffLayout>);
     expect(screen.queryByRole("link", { name: "Prihlášky" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Používatelia" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Moje hodnotenia" })).not.toBeInTheDocument();
   });
 });

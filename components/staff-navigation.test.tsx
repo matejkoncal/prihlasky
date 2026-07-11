@@ -26,4 +26,13 @@ describe("administrator navigation", () => {
     expect(screen.getByRole("link", { name: "Používatelia" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Prihlášky" })).not.toHaveAttribute("aria-current");
   });
+
+  it("marks the administrator's own evaluations as the current section", () => {
+    navigation.pathname = "/hodnotenie";
+    render(<StaffLayout role="admin"><div>Obsah</div></StaffLayout>);
+
+    expect(screen.getByRole("link", { name: "Moje hodnotenia" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Prihlášky" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Používatelia" })).not.toHaveAttribute("aria-current");
+  });
 });

@@ -55,14 +55,14 @@ describe("AdminDashboard", () => {
     expect(screen.getByText("Kategória 1")).toBeInTheDocument();
   });
 
-  it("offers only active reviewers after expansion", async () => {
+  it("offers all active staff including clearly labelled admins", async () => {
     const user = userEvent.setup();
     render(<AdminDashboard applications={applications} reviewers={reviewers} />);
     await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
     await user.click(screen.getByRole("combobox"));
 
     expect(screen.getByRole("option", { name: "Aktívny učiteľ" })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: "Ďalší admin" })).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Ďalší admin (admin)" })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Neaktívny učiteľ" })).not.toBeInTheDocument();
   });
 

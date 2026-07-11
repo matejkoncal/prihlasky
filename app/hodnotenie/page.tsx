@@ -11,7 +11,6 @@ export default async function ReviewerPage() {
   const supabase = await createServerSupabaseClient();
   const user = await getVerifiedStaffUser(supabase as unknown as StaffAuthClient);
   if (!user) redirect("/login");
-  if (user.role === "admin") redirect("/admin");
   const assignments = await getMyReviewAssignments(supabase as unknown as ReviewSupabaseClient);
-  return <StaffLayout role="reviewer"><ReviewerDashboard assignments={assignments} /></StaffLayout>;
+  return <StaffLayout role={user.role}><ReviewerDashboard assignments={assignments} /></StaffLayout>;
 }

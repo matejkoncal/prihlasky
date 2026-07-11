@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const destinations = [
   { href: "/admin", label: "Prihlášky", matches: (pathname: string) => pathname === "/admin" },
   { href: "/admin/hodnotitelia", label: "Používatelia", matches: (pathname: string) => pathname.startsWith("/admin/hodnotitelia") },
+  { href: "/hodnotenie", label: "Moje hodnotenia", matches: (pathname: string) => pathname === "/hodnotenie" },
 ];
 
 export function StaffNavigation() {

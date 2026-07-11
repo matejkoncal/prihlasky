@@ -65,7 +65,7 @@ function AssignReviewerForm({ applicationId, categoryId, reviewers, onResult }: 
       <input type="hidden" name="categoryId" value={categoryId} />
       <Select name="reviewerId" size="small" required displayEmpty defaultValue="" disabled={pending} sx={{ minWidth: 220 }}>
         <MenuItem value="" disabled>Vyberte hodnotiteľa</MenuItem>
-        {reviewers.map((reviewer) => <MenuItem key={reviewer.id} value={reviewer.id}>{reviewer.display_name || reviewer.email}</MenuItem>)}
+        {reviewers.map((reviewer) => <MenuItem key={reviewer.id} value={reviewer.id}>{reviewer.display_name || reviewer.email}{reviewer.role === "admin" ? " (admin)" : ""}</MenuItem>)}
       </Select>
       <Button type="submit" size="small" variant="contained" disabled={pending || reviewers.length === 0} startIcon={pending ? <CircularProgress size={16} color="inherit" /> : undefined}>
         {pending ? "Priraďujem…" : "Priradiť"}
@@ -90,7 +90,7 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const eligibleReviewers = useMemo(
-    () => reviewers.filter((reviewer) => reviewer.role === "reviewer" && reviewer.is_active),
+    () => reviewers.filter((reviewer) => reviewer.is_active),
     [reviewers],
   );
 
