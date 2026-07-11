@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
 import {
   Alert,
   Box,
@@ -46,7 +48,13 @@ interface Category {
 export interface AdminApplication {
   id: string;
   applicant_name: string;
+  class_name: string;
+  field_of_study: string;
   submitted_at: string;
+  attachments: Array<{
+    kind: "cv" | "motivation_letter";
+    original_filename: string;
+  }>;
   categories: Category[];
 }
 
@@ -125,6 +133,19 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                   <Chip size="small" label={`Pridelené ${assigned}/${application.categories.length}`} color={assigned === application.categories.length ? "primary" : "default"} />
                   <Chip size="small" label={summary.isComplete ? "Hodnotenie dokončené" : `Hotové ${summary.completedCount}/${summary.categoryCount}`} color={summary.isComplete ? "success" : "default"} />
                 </Stack>
+                {summary.isComplete && summary.categoryCount === 5 && (
+                  <Button
+                    component="a"
+                    href={`/admin/prihlasky/${application.id}/hodnotenie.pdf`}
+                    variant="outlined"
+                    color="success"
+                    size="small"
+                    startIcon={<PictureAsPdfOutlinedIcon />}
+                    sx={{ alignSelf: { xs: "stretch", md: "center" }, whiteSpace: "nowrap" }}
+                  >
+                    Exportovať hodnotenie PDF
+                  </Button>
+                )}
                 <Button
                   variant={expanded ? "contained" : "outlined"}
                   endIcon={<ExpandMoreIcon sx={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform .2s" }} />}
@@ -138,6 +159,31 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
 
               <Collapse in={expanded} unmountOnExit>
                 <Box sx={{ px: { xs: 2, md: 3 }, pb: 3, pt: 1, bgcolor: "grey.50", borderTop: "1px solid", borderColor: "divider" }}>
+                  <Box sx={{ my: 2, p: 2, bgcolor: "background.paper", border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 750, mb: .5 }}>Dokumenty</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                      {application.class_name || "Trieda neuvedená"} · {application.field_of_study || "Odbor neuvedený"}
+                    </Typography>
+                    {(application.attachments ?? []).length > 0 ? (
+                      <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                        {(application.attachments ?? []).map((attachment) => (
+                          <Button
+                            key={attachment.kind}
+                            component="a"
+                            href={`/admin/prihlasky/${application.id}/prilohy/${attachment.kind}`}
+                            download
+                            variant="outlined"
+                            size="small"
+                            startIcon={<DescriptionOutlinedIcon />}
+                          >
+                            {attachment.kind === "cv" ? "Stiahnuť životopis" : "Stiahnuť motivačný list"}
+                          </Button>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">K tejto prihláške nie sú uložené žiadne prílohy.</Typography>
+                    )}
+                  </Box>
                   {application.categories.map((category) => (
                     <Box data-testid="category-row" key={category.id} sx={{ py: 1.5, minHeight: 104, display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.35fr) minmax(360px, .65fr)" }, alignItems: "center", gap: { xs: 1.5, md: 3 }, borderBottom: "1px solid", borderColor: "divider" }}>
                       <Typography sx={{ fontWeight: 700, pr: { md: 2 } }}>{category.name}</Typography>

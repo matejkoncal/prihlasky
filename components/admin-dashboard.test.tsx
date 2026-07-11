@@ -16,7 +16,13 @@ beforeEach(() => {
 const applications: AdminApplication[] = [{
   id: "11111111-1111-1111-1111-111111111111",
   applicant_name: "Ján Žiak",
+  class_name: "3.A",
+  field_of_study: "Mechanik elektrotechnik",
   submitted_at: "2026-07-10T12:00:00Z",
+  attachments: [
+    { kind: "cv", original_filename: "zivotopis.pdf" },
+    { kind: "motivation_letter", original_filename: "motivacny-list.docx" },
+  ],
   categories: [{ id: "22222222-2222-2222-2222-222222222222", name: "Kategória 1", assignment_id: null, reviewer_name: null, reviewer_email: null, status: null, score: null, comment: null, submitted_at: null }],
 }];
 
@@ -24,7 +30,10 @@ function evaluatedApplication(scores: Array<number | null>, completedCount: numb
   return {
     id: "66666666-6666-6666-6666-666666666666",
     applicant_name: "Eva Hodnotená",
+    class_name: "4.B",
+    field_of_study: "Autoopravár - mechanik",
     submitted_at: "2026-07-10T12:00:00Z",
+    attachments: [],
     categories: scores.map((score, index) => ({
       id: `77777777-7777-7777-7777-${String(index).padStart(12, "0")}`,
       name: `Kategória ${index + 1}`,
@@ -91,6 +100,37 @@ describe("AdminDashboard", () => {
     expect(screen.getByText("Skóre 35/50")).toBeInTheDocument();
     expect(screen.getByText("Kritérium splnené")).toBeInTheDocument();
     expect(screen.getByText("Hodnotenie dokončené")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Exportovať hodnotenie PDF" })).toHaveAttribute(
+      "href",
+      "/admin/prihlasky/66666666-6666-6666-6666-666666666666/hodnotenie.pdf",
+    );
+  });
+
+  it("shows stored application documents only inside the expanded detail", async () => {
+    const user = userEvent.setup();
+    render(<AdminDashboard applications={applications} reviewers={reviewers} />);
+
+    expect(screen.queryByRole("link", { name: "Stiahnuť životopis" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
+
+    expect(screen.getByText("Dokumenty")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Stiahnuť životopis" })).toHaveAttribute(
+      "href",
+      "/admin/prihlasky/11111111-1111-1111-1111-111111111111/prilohy/cv",
+    );
+    expect(screen.getByRole("link", { name: "Stiahnuť motivačný list" })).toHaveAttribute(
+      "href",
+      "/admin/prihlasky/11111111-1111-1111-1111-111111111111/prilohy/motivation_letter",
+    );
+  });
+
+  it("does not offer an evaluation PDF unless exactly five reviews are complete", () => {
+    render(<AdminDashboard applications={[
+      evaluatedApplication([10, 10, 10, 10], 4),
+      evaluatedApplication([8, 7, 6, null, null], 3),
+    ]} reviewers={reviewers} />);
+
+    expect(screen.queryByRole("link", { name: "Exportovať hodnotenie PDF" })).not.toBeInTheDocument();
   });
 
   it("shows partial progress without marking an unfinished result as failed", () => {
