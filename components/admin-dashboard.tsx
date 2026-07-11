@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Alert, Box, Button, Container, MenuItem, Paper, Select, Typography } from "@mui/material";
 import { assignReviewer, removeAssignment } from "@/app/admin/actions";
 
-export interface AdminReviewer { id: string; email: string; display_name: string | null; pending_count: number; completed_count: number; }
+export interface AdminReviewer { id: string; email: string; display_name: string | null; role: "admin" | "reviewer"; is_active: boolean; pending_count: number; completed_count: number; }
 interface Category { id: string; name: string; assignment_id: string | null; reviewer_name: string | null; reviewer_email: string | null; status: "pending" | "completed" | null; score: number | null; comment: string | null; submitted_at: string | null; }
 export interface AdminApplication { id: string; applicant_name: string; submitted_at: string; categories: Category[]; }
 

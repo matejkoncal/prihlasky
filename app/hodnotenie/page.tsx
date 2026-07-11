@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getMyReviewAssignments, type ReviewSupabaseClient } from "@/server/review-repository";
 import { getVerifiedStaffUser, type StaffAuthClient } from "@/server/staff-auth";
 import { ReviewerDashboard } from "@/components/reviewer-dashboard";
+import { StaffLayout } from "@/components/staff-layout";
 
 export const dynamic = "force-dynamic";
 
@@ -12,5 +13,5 @@ export default async function ReviewerPage() {
   if (!user) redirect("/login");
   if (user.role === "admin") redirect("/admin");
   const assignments = await getMyReviewAssignments(supabase as unknown as ReviewSupabaseClient);
-  return <ReviewerDashboard assignments={assignments} />;
+  return <StaffLayout role="reviewer"><ReviewerDashboard assignments={assignments} /></StaffLayout>;
 }

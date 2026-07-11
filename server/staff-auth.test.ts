@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { getVerifiedStaffUser } from "./staff-auth";
 
-function clientFor(role: "admin" | "reviewer" | null) {
+function clientFor(role: "admin" | "reviewer" | null, isActive = true) {
   const single = vi.fn(async () => ({
-    data: role ? { id: "user-id", role } : null,
+    data: role ? { id: "user-id", role, is_active: isActive } : null,
     error: null,
   }));
   const eq = vi.fn(() => ({ single }));
@@ -31,5 +31,9 @@ describe("getVerifiedStaffUser", () => {
 
   it("returns null when the Auth user has no profile", async () => {
     await expect(getVerifiedStaffUser(clientFor(null))).resolves.toBeNull();
+  });
+
+  it("returns null for a deactivated profile", async () => {
+    await expect(getVerifiedStaffUser(clientFor("reviewer", false))).resolves.toBeNull();
   });
 });

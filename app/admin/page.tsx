@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getVerifiedStaffUser, type StaffAuthClient } from "@/server/staff-auth";
 import { AdminDashboard, type AdminApplication, type AdminReviewer } from "@/components/admin-dashboard";
+import { StaffLayout } from "@/components/staff-layout";
 
 export const dynamic = "force-dynamic";
 
@@ -11,5 +12,5 @@ export default async function AdminPage() {
   if (!user) redirect("/login"); if (user.role !== "admin") redirect("/hodnotenie");
   const [{ data: applications, error: applicationsError }, { data: reviewers, error: reviewersError }] = await Promise.all([supabase.rpc("admin_list_applications"), supabase.rpc("admin_list_reviewers")]);
   if (applicationsError || reviewersError) throw new Error(applicationsError?.message || reviewersError?.message);
-  return <AdminDashboard applications={(applications ?? []) as unknown as AdminApplication[]} reviewers={(reviewers ?? []) as unknown as AdminReviewer[]} />;
+  return <StaffLayout role="admin"><AdminDashboard applications={(applications ?? []) as unknown as AdminApplication[]} reviewers={(reviewers ?? []) as unknown as AdminReviewer[]} /></StaffLayout>;
 }
