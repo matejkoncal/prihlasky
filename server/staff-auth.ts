@@ -13,7 +13,7 @@ interface ProfileResult {
 export interface StaffAuthClient {
   auth: {
     getClaims(): Promise<{
-      data: { claims: { sub?: unknown } | null };
+      data: { claims: { sub?: unknown } | null } | null;
       error: { message: string } | null;
     }>;
   };
@@ -29,7 +29,7 @@ export async function getVerifiedStaffUser(
 ): Promise<VerifiedStaffUser | null> {
   const { data, error } = await supabase.auth.getClaims();
   if (error) throw new Error(error.message);
-  const userId = data.claims?.sub;
+  const userId = data?.claims?.sub;
   if (typeof userId !== "string") return null;
 
   const { data: profile, error: profileError } = await supabase

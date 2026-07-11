@@ -29,6 +29,13 @@ describe("getVerifiedStaffUser", () => {
     await expect(getVerifiedStaffUser(client)).resolves.toBeNull();
   });
 
+  it("returns null when Supabase has no authenticated claims payload", async () => {
+    const client = clientFor("reviewer");
+    client.auth.getClaims.mockResolvedValueOnce({ data: null, error: null });
+
+    await expect(getVerifiedStaffUser(client)).resolves.toBeNull();
+  });
+
   it("returns null when the Auth user has no profile", async () => {
     await expect(getVerifiedStaffUser(clientFor(null))).resolves.toBeNull();
   });
