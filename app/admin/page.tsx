@@ -12,5 +12,5 @@ export default async function AdminPage() {
   if (!user) redirect("/login"); if (user.role !== "admin") redirect("/hodnotenie");
   const [{ data: applications, error: applicationsError }, { data: reviewers, error: reviewersError }] = await Promise.all([supabase.rpc("admin_list_applications"), supabase.rpc("admin_list_reviewers")]);
   if (applicationsError || reviewersError) throw new Error(applicationsError?.message || reviewersError?.message);
-  return <StaffLayout role="admin"><AdminDashboard applications={(applications ?? []) as unknown as AdminApplication[]} reviewers={(reviewers ?? []) as unknown as AdminReviewer[]} /></StaffLayout>;
+  return <StaffLayout user={user}><AdminDashboard applications={(applications ?? []) as unknown as AdminApplication[]} reviewers={(reviewers ?? []) as unknown as AdminReviewer[]} /></StaffLayout>;
 }

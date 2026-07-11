@@ -4,6 +4,9 @@ import { Children, isValidElement, type ReactElement, type ReactNode } from "rea
 import { afterEach, describe, expect, it } from "vitest";
 import { StaffLayout } from "./staff-layout";
 
+const admin = { id: "admin-id", role: "admin" as const, displayName: "Matej Koncal", email: "matej@koncal.sk" };
+const reviewer = { id: "reviewer-id", role: "reviewer" as const, displayName: null, email: "ucitel@example.sk" };
+
 afterEach(cleanup);
 
 function findElement(node: ReactNode, type: ReactElement["type"]): ReactElement | null {
@@ -19,12 +22,12 @@ function findElement(node: ReactNode, type: ReactElement["type"]): ReactElement 
 
 describe("StaffLayout", () => {
   it("keeps the staff navigation sticky while content scrolls", () => {
-    render(<StaffLayout role="admin"><div>Obsah</div></StaffLayout>);
+    render(<StaffLayout user={admin}><div>Obsah</div></StaffLayout>);
     expect(screen.getByRole("banner")).toHaveStyle({ position: "sticky", top: "0px" });
   });
 
   it("does not pass a non-serializable style callback from the server layout", () => {
-    const layout = StaffLayout({ role: "admin", children: <div>Obsah</div> });
+    const layout = StaffLayout({ user: admin, children: <div>Obsah</div> });
     const appBar = findElement(layout, AppBar);
 
     expect(appBar).not.toBeNull();
@@ -32,14 +35,26 @@ describe("StaffLayout", () => {
   });
 
   it("shows administrator destinations only to administrators", () => {
-    const { rerender } = render(<StaffLayout role="admin"><div>Obsah</div></StaffLayout>);
+    const { rerender } = render(<StaffLayout user={admin}><div>Obsah</div></StaffLayout>);
     expect(screen.getByRole("link", { name: "Prihlášky" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Používatelia" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Moje hodnotenia" })).toBeInTheDocument();
 
-    rerender(<StaffLayout role="reviewer"><div>Obsah</div></StaffLayout>);
+    rerender(<StaffLayout user={reviewer}><div>Obsah</div></StaffLayout>);
     expect(screen.queryByRole("link", { name: "Prihlášky" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Používatelia" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Moje hodnotenia" })).not.toBeInTheDocument();
+  });
+
+  it("shows the school logo and current user identity", () => {
+    const { rerender } = render(<StaffLayout user={admin}><div>Obsah</div></StaffLayout>);
+
+    expect(screen.getByRole("img", { name: "SOŠTaR" })).toBeInTheDocument();
+    expect(screen.getByText("Matej Koncal")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+
+    rerender(<StaffLayout user={reviewer}><div>Obsah</div></StaffLayout>);
+    expect(screen.getByText("ucitel@example.sk")).toBeInTheDocument();
+    expect(screen.getByText("Hodnotiteľ")).toBeInTheDocument();
   });
 });

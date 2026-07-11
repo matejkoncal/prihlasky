@@ -3,10 +3,18 @@ export type StaffRole = "admin" | "reviewer";
 export interface VerifiedStaffUser {
   id: string;
   role: StaffRole;
+  displayName: string | null;
+  email: string;
 }
 
 interface ProfileResult {
-  data: { id: string; role: StaffRole; is_active: boolean } | null;
+  data: {
+    id: string;
+    role: StaffRole;
+    is_active: boolean;
+    display_name: string | null;
+    email: string;
+  } | null;
   error: { message: string } | null;
 }
 
@@ -18,7 +26,7 @@ export interface StaffAuthClient {
     }>;
   };
   from(table: "profiles"): {
-    select(columns: "id, role, is_active"): {
+    select(columns: "id, role, is_active, display_name, email"): {
       eq(column: "id", value: string): { single(): Promise<ProfileResult> };
     };
   };
@@ -34,10 +42,15 @@ export async function getVerifiedStaffUser(
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("id, role, is_active")
+    .select("id, role, is_active, display_name, email")
     .eq("id", userId)
     .single();
   if (profileError) throw new Error(profileError.message);
   if (!profile?.is_active) return null;
-  return { id: profile.id, role: profile.role };
+  return {
+    id: profile.id,
+    role: profile.role,
+    displayName: profile.display_name,
+    email: profile.email,
+  };
 }

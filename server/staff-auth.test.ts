@@ -3,7 +3,13 @@ import { getVerifiedStaffUser } from "./staff-auth";
 
 function clientFor(role: "admin" | "reviewer" | null, isActive = true) {
   const single = vi.fn(async () => ({
-    data: role ? { id: "user-id", role, is_active: isActive } : null,
+    data: role ? {
+      id: "user-id",
+      role,
+      is_active: isActive,
+      display_name: "Matej Koncal",
+      email: "matej@koncal.sk",
+    } : null,
     error: null,
   }));
   const eq = vi.fn(() => ({ single }));
@@ -19,6 +25,8 @@ describe("getVerifiedStaffUser", () => {
     await expect(getVerifiedStaffUser(clientFor("admin"))).resolves.toEqual({
       id: "user-id",
       role: "admin",
+      displayName: "Matej Koncal",
+      email: "matej@koncal.sk",
     });
   });
 

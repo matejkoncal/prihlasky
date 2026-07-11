@@ -36,12 +36,13 @@ describe("ReviewerPage", () => {
   });
 
   it("renders an administrator's own assignments with the admin staff layout", async () => {
-    mocks.getVerifiedStaffUser.mockResolvedValue({ id: "admin-id", role: "admin" });
+    const user = { id: "admin-id", role: "admin", displayName: "Admin", email: "admin@example.sk" };
+    mocks.getVerifiedStaffUser.mockResolvedValue(user);
 
     const page = await ReviewerPage();
 
     expect(page.type).toBe(StaffLayout);
-    expect(page.props.role).toBe("admin");
+    expect(page.props.user).toBe(user);
     expect(mocks.getMyReviewAssignments).toHaveBeenCalledWith(mocks.client);
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
