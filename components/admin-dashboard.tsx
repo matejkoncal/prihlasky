@@ -139,8 +139,8 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
               <Collapse in={expanded} unmountOnExit>
                 <Box sx={{ px: { xs: 2, md: 3 }, pb: 3, pt: 1, bgcolor: "grey.50", borderTop: "1px solid", borderColor: "divider" }}>
                   {application.categories.map((category) => (
-                    <Box key={category.id} sx={{ py: 2, display: "grid", gridTemplateColumns: { xs: "1fr", md: "180px 1fr" }, gap: 2, borderBottom: "1px solid", borderColor: "divider" }}>
-                      <Typography sx={{ fontWeight: 700 }}>{category.name}</Typography>
+                    <Box data-testid="category-row" key={category.id} sx={{ py: 1.5, minHeight: 104, display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.35fr) minmax(360px, .65fr)" }, alignItems: "center", gap: { xs: 1.5, md: 3 }, borderBottom: "1px solid", borderColor: "divider" }}>
+                      <Typography sx={{ fontWeight: 700, pr: { md: 2 } }}>{category.name}</Typography>
                       {category.status === "completed" ? (
                         <Box><Chip size="small" color="success" label="Hotovo" sx={{ mr: 1 }} /><Typography component="span">{category.reviewer_name ?? category.reviewer_email}, {category.score}/10 — {category.comment || "bez komentára"}</Typography></Box>
                       ) : category.assignment_id ? (

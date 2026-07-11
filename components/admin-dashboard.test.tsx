@@ -66,6 +66,14 @@ describe("AdminDashboard", () => {
     expect(screen.queryByRole("option", { name: "Neaktívny učiteľ" })).not.toBeInTheDocument();
   });
 
+  it("gives category rows a consistent desktop-friendly layout", async () => {
+    const user = userEvent.setup();
+    render(<AdminDashboard applications={applications} reviewers={reviewers} />);
+    await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
+
+    expect(screen.getByTestId("category-row")).toHaveStyle({ minHeight: "104px", alignItems: "center" });
+  });
+
   it("shows action feedback in a viewport snackbar", async () => {
     const user = userEvent.setup();
     render(<AdminDashboard applications={applications} reviewers={reviewers} />);
