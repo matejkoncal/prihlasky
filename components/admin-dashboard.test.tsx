@@ -1,14 +1,17 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminDashboard, type AdminApplication, type AdminReviewer } from "./admin-dashboard";
 
-vi.mock("@/app/admin/actions", () => ({
-  assignReviewer: vi.fn(async () => ({ success: "Hodnotiteľ bol priradený" })),
-  removeAssignment: vi.fn(async () => ({ success: "Priradenie bolo odstránené" })),
-}));
+const actions = vi.hoisted(() => ({ assignReviewer: vi.fn(), removeAssignment: vi.fn() }));
+
+vi.mock("@/app/admin/actions", () => actions);
 
 afterEach(cleanup);
+beforeEach(() => {
+  actions.assignReviewer.mockReset().mockResolvedValue({ success: "Hodnotiteľ bol priradený" });
+  actions.removeAssignment.mockReset().mockResolvedValue({ success: "Priradenie bolo odstránené" });
+});
 
 const applications: AdminApplication[] = [{
   id: "11111111-1111-1111-1111-111111111111",
@@ -16,6 +19,25 @@ const applications: AdminApplication[] = [{
   submitted_at: "2026-07-10T12:00:00Z",
   categories: [{ id: "22222222-2222-2222-2222-222222222222", name: "Kategória 1", assignment_id: null, reviewer_name: null, reviewer_email: null, status: null, score: null, comment: null, submitted_at: null }],
 }];
+
+function evaluatedApplication(scores: Array<number | null>, completedCount: number): AdminApplication {
+  return {
+    id: "66666666-6666-6666-6666-666666666666",
+    applicant_name: "Eva Hodnotená",
+    submitted_at: "2026-07-10T12:00:00Z",
+    categories: scores.map((score, index) => ({
+      id: `77777777-7777-7777-7777-${String(index).padStart(12, "0")}`,
+      name: `Kategória ${index + 1}`,
+      assignment_id: `88888888-8888-8888-8888-${String(index).padStart(12, "0")}`,
+      reviewer_name: `Hodnotiteľ ${index + 1}`,
+      reviewer_email: null,
+      status: index < completedCount ? "completed" : "pending",
+      score,
+      comment: "",
+      submitted_at: index < completedCount ? "2026-07-11T08:00:00Z" : null,
+    })),
+  };
+}
 
 const reviewers: AdminReviewer[] = [
   { id: "33333333-3333-3333-3333-333333333333", email: "ucitel@example.sk", display_name: "Aktívny učiteľ", role: "reviewer", is_active: true, pending_count: 0, completed_count: 0 },
@@ -52,6 +74,44 @@ describe("AdminDashboard", () => {
     await user.click(screen.getByRole("option", { name: "Aktívny učiteľ" }));
     await user.click(screen.getByRole("button", { name: "Priradiť" }));
 
+    expect(await screen.findByRole("alert")).toHaveTextContent("Hodnotiteľ bol priradený");
+  });
+
+  it("shows the final score, met criterion, and completed evaluation", () => {
+    render(<AdminDashboard applications={[evaluatedApplication([10, 8, 7, 5, 5], 5)]} reviewers={reviewers} />);
+
+    expect(screen.getByText("Skóre 35/50")).toBeInTheDocument();
+    expect(screen.getByText("Kritérium splnené")).toBeInTheDocument();
+    expect(screen.getByText("Hodnotenie dokončené")).toBeInTheDocument();
+  });
+
+  it("shows partial progress without marking an unfinished result as failed", () => {
+    render(<AdminDashboard applications={[evaluatedApplication([8, 7, 6, null, null], 3)]} reviewers={reviewers} />);
+
+    expect(screen.getByText("Skóre 21/50")).toBeInTheDocument();
+    expect(screen.getByText("Hotové 3/5")).toBeInTheDocument();
+    expect(screen.queryByText("Kritérium nesplnené")).not.toBeInTheDocument();
+  });
+
+  it("locks one assignment form and shows progress while it is submitting", async () => {
+    let resolveAction!: (result: { success: string }) => void;
+    actions.assignReviewer.mockImplementation(() => new Promise((resolve) => { resolveAction = resolve; }));
+    const user = userEvent.setup();
+    render(<AdminDashboard applications={applications} reviewers={reviewers} />);
+    await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("option", { name: "Aktívny učiteľ" }));
+
+    const submit = screen.getByRole("button", { name: "Priradiť" });
+    await user.click(submit);
+    await waitFor(() => expect(actions.assignReviewer).toHaveBeenCalledTimes(1));
+
+    await waitFor(() => expect(screen.getByRole("button", { name: /priraďujem/i })).toBeDisabled());
+    expect(screen.getByRole("combobox")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
+    expect(actions.assignReviewer).toHaveBeenCalledTimes(1);
+
+    resolveAction({ success: "Hodnotiteľ bol priradený" });
     expect(await screen.findByRole("alert")).toHaveTextContent("Hodnotiteľ bol priradený");
   });
 });

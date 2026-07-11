@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Collapse,
   Container,
   MenuItem,
@@ -17,6 +18,8 @@ import {
   Typography,
 } from "@mui/material";
 import { assignReviewer, removeAssignment } from "@/app/admin/actions";
+import { getEvaluationSummary } from "@/lib/evaluation-summary";
+import { usePendingFormAction, type FormActionResult } from "@/components/use-pending-form-action";
 
 export interface AdminReviewer {
   id: string;
@@ -49,6 +52,40 @@ export interface AdminApplication {
 
 type Feedback = { severity: "success" | "error"; message: string } | null;
 
+function AssignReviewerForm({ applicationId, categoryId, reviewers, onResult }: {
+  applicationId: string;
+  categoryId: string;
+  reviewers: AdminReviewer[];
+  onResult: (result: FormActionResult) => void;
+}) {
+  const { pending, formAction } = usePendingFormAction(assignReviewer, onResult, "Priradenie sa nepodarilo vytvoriť");
+  return (
+    <Box component="form" action={formAction} sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 1 }}>
+      <input type="hidden" name="applicationId" value={applicationId} />
+      <input type="hidden" name="categoryId" value={categoryId} />
+      <Select name="reviewerId" size="small" required displayEmpty defaultValue="" disabled={pending} sx={{ minWidth: 220 }}>
+        <MenuItem value="" disabled>Vyberte hodnotiteľa</MenuItem>
+        {reviewers.map((reviewer) => <MenuItem key={reviewer.id} value={reviewer.id}>{reviewer.display_name || reviewer.email}</MenuItem>)}
+      </Select>
+      <Button type="submit" size="small" variant="contained" disabled={pending || reviewers.length === 0} startIcon={pending ? <CircularProgress size={16} color="inherit" /> : undefined}>
+        {pending ? "Priraďujem…" : "Priradiť"}
+      </Button>
+    </Box>
+  );
+}
+
+function RemoveAssignmentForm({ assignmentId, onResult }: { assignmentId: string; onResult: (result: FormActionResult) => void }) {
+  const { pending, formAction } = usePendingFormAction(removeAssignment, onResult, "Priradenie sa nepodarilo odstrániť");
+  return (
+    <Box component="form" action={formAction}>
+      <input type="hidden" name="assignmentId" value={assignmentId} />
+      <Button type="submit" size="small" color="error" disabled={pending} startIcon={pending ? <CircularProgress size={16} color="inherit" /> : undefined}>
+        {pending ? "Odoberám…" : "Odobrať"}
+      </Button>
+    </Box>
+  );
+}
+
 export function AdminDashboard({ applications, reviewers }: { applications: AdminApplication[]; reviewers: AdminReviewer[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -71,7 +108,7 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
 
       <Stack spacing={2}>
         {applications.map((application) => {
-          const completed = application.categories.filter((category) => category.status === "completed").length;
+          const summary = getEvaluationSummary(application.categories);
           const assigned = application.categories.filter((category) => category.assignment_id).length;
           const expanded = expandedId === application.id;
           return (
@@ -82,8 +119,11 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                   <Typography variant="body2" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
                 </Box>
                 <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap" }}>
+                  <Chip size="small" label={`Skóre ${summary.totalScore}/${summary.maximumScore}`} variant="outlined" />
+                  {summary.criterion === "met" && <Chip size="small" label="Kritérium splnené" color="success" />}
+                  {summary.criterion === "not-met" && <Chip size="small" label="Kritérium nesplnené" color="error" />}
                   <Chip size="small" label={`Pridelené ${assigned}/${application.categories.length}`} color={assigned === application.categories.length ? "primary" : "default"} />
-                  <Chip size="small" label={`Hotové ${completed}/${application.categories.length}`} color={completed === application.categories.length ? "success" : "default"} />
+                  <Chip size="small" label={summary.isComplete ? "Hodnotenie dokončené" : `Hotové ${summary.completedCount}/${summary.categoryCount}`} color={summary.isComplete ? "success" : "default"} />
                 </Stack>
                 <Button
                   variant={expanded ? "contained" : "outlined"}
@@ -106,21 +146,10 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                       ) : category.assignment_id ? (
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ alignItems: { sm: "center" } }}>
                           <Typography sx={{ flexGrow: 1 }}>Čaká na: {category.reviewer_name ?? category.reviewer_email}</Typography>
-                          <Box component="form" action={async (formData) => showResult(await removeAssignment(formData))}>
-                            <input type="hidden" name="assignmentId" value={category.assignment_id} />
-                            <Button type="submit" size="small" color="error">Odobrať</Button>
-                          </Box>
+                          <RemoveAssignmentForm assignmentId={category.assignment_id} onResult={showResult} />
                         </Stack>
                       ) : (
-                        <Box component="form" action={async (formData) => showResult(await assignReviewer(formData))} sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 1 }}>
-                          <input type="hidden" name="applicationId" value={application.id} />
-                          <input type="hidden" name="categoryId" value={category.id} />
-                          <Select name="reviewerId" size="small" required displayEmpty defaultValue="" sx={{ minWidth: 220 }}>
-                            <MenuItem value="" disabled>Vyberte hodnotiteľa</MenuItem>
-                            {eligibleReviewers.map((reviewer) => <MenuItem key={reviewer.id} value={reviewer.id}>{reviewer.display_name || reviewer.email}</MenuItem>)}
-                          </Select>
-                          <Button type="submit" size="small" variant="contained" disabled={eligibleReviewers.length === 0}>Priradiť</Button>
-                        </Box>
+                        <AssignReviewerForm applicationId={application.id} categoryId={category.id} reviewers={eligibleReviewers} onResult={showResult} />
                       )}
                     </Box>
                   ))}
