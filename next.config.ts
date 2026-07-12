@@ -1,4 +1,10 @@
 import type { NextConfig } from "next";
+import { assertProductionEnvironment } from "./server/production-environment";
+
+assertProductionEnvironment({
+  VERCEL_ENV: process.env.VERCEL_ENV,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+});
 
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
