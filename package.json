@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "deploy:production": "bash scripts/deploy-production.sh",
     "lint": "eslint .",
     "test": "vitest run"
   },
