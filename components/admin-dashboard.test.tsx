@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminDashboard, type AdminApplication, type AdminReviewer } from "./admin-dashboard";
@@ -101,9 +101,19 @@ describe("AdminDashboard", () => {
   it("shows the final score, met criterion, and completed evaluation", () => {
     render(<AdminDashboard applications={[evaluatedApplication([10, 8, 7, 5, 5], 5)]} reviewers={reviewers} />);
 
-    expect(screen.getByText("Skóre 35/50")).toBeInTheDocument();
+    const identity = screen.getByTestId("application-identity");
+    expect(within(identity).getByText("Eva Hodnotená")).toBeInTheDocument();
+    expect(within(identity).getByText(/4\.B/)).toBeInTheDocument();
+    expect(within(identity).getByText(/Autoopravár - mechanik/)).toBeInTheDocument();
+
+    const metrics = screen.getByTestId("application-metrics");
+    expect(within(metrics).getByText("Skóre")).toBeInTheDocument();
+    expect(within(metrics).getByText("35/50")).toBeInTheDocument();
+    expect(within(metrics).getByText("Pridelené")).toBeInTheDocument();
+    expect(within(metrics).getAllByText("5/5")).toHaveLength(2);
+    expect(within(metrics).getByText("Hotové")).toBeInTheDocument();
     expect(screen.getByText("Kritérium splnené")).toBeInTheDocument();
-    expect(screen.getByText("Hodnotenie dokončené")).toBeInTheDocument();
+    expect(screen.getByTestId("application-actions")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Exportovať hodnotenie PDF/ })).toHaveAttribute(
       "href",
       "/admin/prihlasky/66666666-6666-6666-6666-666666666666/hodnotenie.pdf",
@@ -140,8 +150,8 @@ describe("AdminDashboard", () => {
   it("shows partial progress without marking an unfinished result as failed", () => {
     render(<AdminDashboard applications={[evaluatedApplication([8, 7, 6, null, null], 3)]} reviewers={reviewers} />);
 
-    expect(screen.getByText("Skóre 21/50")).toBeInTheDocument();
-    expect(screen.getByText("Hotové 3/5")).toBeInTheDocument();
+    expect(screen.getByText("21/50")).toBeInTheDocument();
+    expect(screen.getByText("3/5")).toBeInTheDocument();
     expect(screen.queryByText("Kritérium nesplnené")).not.toBeInTheDocument();
   });
 

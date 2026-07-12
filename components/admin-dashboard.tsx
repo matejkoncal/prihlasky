@@ -62,6 +62,15 @@ export interface AdminApplication {
 
 type Feedback = { severity: "success" | "error"; message: string } | null;
 
+function SummaryMetric({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <Box sx={{ minWidth: 74, px: 1.4, py: .8, borderLeft: "1px solid", borderColor: "divider", "&:first-of-type": { borderLeft: 0 } }}>
+      <Typography variant="caption" sx={{ display: "block", color: "text.secondary", lineHeight: 1.1, mb: .35 }}>{label}</Typography>
+      <Typography sx={{ fontSize: 14, lineHeight: 1.2, fontWeight: 800, color: accent ? "primary.main" : "text.primary" }}>{value}</Typography>
+    </Box>
+  );
+}
+
 function AssignReviewerForm({ applicationId, categoryId, reviewers, onResult }: {
   applicationId: string;
   categoryId: string;
@@ -122,20 +131,25 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
           const assigned = application.categories.filter((category) => category.assignment_id).length;
           const expanded = expandedId === application.id;
           return (
-            <Paper key={application.id} variant="outlined" sx={{ borderRadius: 3, overflow: "hidden", borderColor: expanded ? "primary.main" : "divider" }}>
-              <Box sx={{ p: { xs: 2, md: 2.5 }, display: "grid", gridTemplateColumns: { xs: "1fr auto", md: "minmax(220px, 1fr) auto auto" }, alignItems: "center", gap: { xs: 1.5, md: 2 } }}>
-                <Box sx={{ minWidth: 0 }}>
+            <Paper key={application.id} variant="outlined" sx={{ borderRadius: 3, overflow: "hidden", borderColor: expanded ? "primary.main" : "#dfe7ef", boxShadow: expanded ? "0 10px 30px rgba(16,47,74,.08)" : "0 3px 14px rgba(16,47,74,.035)", transition: "border-color .2s, box-shadow .2s" }}>
+              <Box sx={{ p: { xs: 2, md: 2.25 }, display: "grid", gridTemplateColumns: { xs: "minmax(0,1fr) auto", md: "minmax(260px,1.2fr) minmax(390px,auto) auto" }, alignItems: "center", columnGap: { xs: 1.5, md: 2.5 }, rowGap: 1.5 }}>
+                <Box data-testid="application-identity" sx={{ minWidth: 0, gridColumn: 1, gridRow: 1 }}>
                   <Typography variant="h6" noWrap sx={{ fontWeight: 750 }}>{application.applicant_name}</Typography>
-                  <Typography variant="body2" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
+                  <Typography variant="body2" noWrap color="text.secondary" sx={{ mt: .15 }}>
+                    {[application.class_name, application.field_of_study].filter(Boolean).join(" · ") || "Trieda a odbor neuvedené"}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
                 </Box>
-                <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", justifyContent: { xs: "flex-start", md: "flex-end" }, gridColumn: { xs: "1 / -1", md: "auto" }, gridRow: { xs: 2, md: 1 } }}>
-                  <Chip size="small" label={`Skóre ${summary.totalScore}/${summary.maximumScore}`} variant="outlined" />
-                  {summary.criterion === "met" && <Chip size="small" label="Kritérium splnené" color="success" />}
-                  {summary.criterion === "not-met" && <Chip size="small" label="Kritérium nesplnené" color="error" />}
-                  <Chip size="small" label={`Pridelené ${assigned}/${application.categories.length}`} color={assigned === application.categories.length ? "primary" : "default"} />
-                  <Chip size="small" label={summary.isComplete ? "Hodnotenie dokončené" : `Hotové ${summary.completedCount}/${summary.categoryCount}`} color={summary.isComplete ? "success" : "default"} />
-                </Stack>
-                <Stack direction="row" spacing={.5} sx={{ justifySelf: "end", gridColumn: { xs: 2, md: 3 }, gridRow: 1 }}>
+                <Box data-testid="application-metrics" sx={{ display: "flex", alignItems: "center", justifySelf: { xs: "stretch", md: "end" }, gridColumn: { xs: "1 / -1", md: 2 }, gridRow: { xs: 2, md: 1 }, minWidth: 0 }}>
+                  <Box sx={{ display: "flex", flexShrink: 0, border: "1px solid", borderColor: "divider", borderRadius: 2, bgcolor: "#f8fafc", overflow: "hidden" }}>
+                    <SummaryMetric label="Skóre" value={`${summary.totalScore}/${summary.maximumScore}`} />
+                    <SummaryMetric label="Pridelené" value={`${assigned}/${application.categories.length}`} accent={assigned === application.categories.length} />
+                    <SummaryMetric label="Hotové" value={`${summary.completedCount}/${summary.categoryCount}`} accent={summary.isComplete} />
+                  </Box>
+                  {summary.criterion === "met" && <Chip size="small" label="Kritérium splnené" color="success" sx={{ ml: 1.25, fontWeight: 700 }} />}
+                  {summary.criterion === "not-met" && <Chip size="small" label="Kritérium nesplnené" color="error" sx={{ ml: 1.25, fontWeight: 700 }} />}
+                </Box>
+                <Stack data-testid="application-actions" direction="row" spacing={.5} sx={{ justifySelf: "end", gridColumn: { xs: 2, md: 3 }, gridRow: 1 }}>
                   {summary.isComplete && summary.categoryCount === 5 && (
                     <Tooltip title="Exportovať hodnotenie PDF">
                       <IconButton
