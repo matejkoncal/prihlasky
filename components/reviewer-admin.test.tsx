@@ -4,19 +4,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReviewerAdmin } from "./reviewer-admin";
 import type { AdminReviewer } from "./admin-dashboard";
 
-const actions = vi.hoisted(() => ({ inviteReviewer: vi.fn(), deactivateStaff: vi.fn() }));
+const actions = vi.hoisted(() => ({ inviteReviewer: vi.fn(), deactivateStaff: vi.fn(), reactivateStaff: vi.fn() }));
 
 vi.mock("@/app/admin/hodnotitelia/actions", () => actions);
 
 const reviewers: AdminReviewer[] = [
   { id: "11111111-1111-1111-1111-111111111111", email: "prvy@example.sk", display_name: "Prvý hodnotiteľ", role: "reviewer", is_active: true, pending_count: 1, completed_count: 0 },
   { id: "22222222-2222-2222-2222-222222222222", email: "druhy@example.sk", display_name: "Druhý hodnotiteľ", role: "reviewer", is_active: true, pending_count: 0, completed_count: 1 },
+  { id: "33333333-3333-3333-3333-333333333333", email: "stary@example.sk", display_name: "Starý hodnotiteľ", role: "reviewer", is_active: false, pending_count: 0, completed_count: 2 },
 ];
 
 afterEach(cleanup);
 beforeEach(() => {
   actions.inviteReviewer.mockReset().mockResolvedValue({});
   actions.deactivateStaff.mockReset().mockResolvedValue({});
+  actions.reactivateStaff.mockReset().mockResolvedValue({});
 });
 
 describe("ReviewerAdmin pending actions", () => {
@@ -57,5 +59,20 @@ describe("ReviewerAdmin pending actions", () => {
 
     resolveDeactivate({});
     await waitFor(() => expect(screen.getAllByRole("button", { name: "Deaktivovať prístup" })).toHaveLength(2));
+  });
+
+  it("reactivates an inactive staff member and locks only that row", async () => {
+    let resolveReactivate!: (result: Record<string, never>) => void;
+    actions.reactivateStaff.mockImplementation(() => new Promise((resolve) => { resolveReactivate = resolve; }));
+    const user = userEvent.setup();
+    render(<ReviewerAdmin reviewers={reviewers} />);
+
+    await user.click(screen.getByRole("button", { name: "Aktivovať prístup" }));
+    await waitFor(() => expect(actions.reactivateStaff).toHaveBeenCalledTimes(1));
+    expect(screen.getByRole("button", { name: /aktivujem/i })).toBeDisabled();
+    expect(screen.getAllByRole("button", { name: "Deaktivovať prístup" })[0]).toBeEnabled();
+
+    resolveReactivate({});
+    await waitFor(() => expect(screen.getByRole("button", { name: "Aktivovať prístup" })).toBeEnabled());
   });
 });

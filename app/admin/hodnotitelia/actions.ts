@@ -38,3 +38,16 @@ export async function deactivateStaff(formData: FormData): Promise<{ error?: str
   revalidatePath("/admin");
   return {};
 }
+
+export async function reactivateStaff(formData: FormData): Promise<{ error?: string }> {
+  const profileId = formData.get("profileId");
+  if (typeof profileId !== "string" || !/^[0-9a-f-]{36}$/i.test(profileId)) return { error: "Neplatný používateľ" };
+  const session = await createServerSupabaseClient();
+  const user = await getVerifiedStaffUser(session as unknown as StaffAuthClient);
+  if (user?.role !== "admin") return { error: "Nemáte oprávnenie správcu" };
+  const { error } = await session.rpc("admin_reactivate_profile", { p_profile_id: profileId });
+  if (error) return { error: "Používateľa sa nepodarilo aktivovať." };
+  revalidatePath("/admin/hodnotitelia");
+  revalidatePath("/admin");
+  return {};
+}

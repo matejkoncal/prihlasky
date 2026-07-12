@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Alert, Box, Button, Chip, CircularProgress, Container, MenuItem, Paper, Select, TextField, Typography } from "@mui/material";
-import { deactivateStaff, inviteReviewer } from "@/app/admin/hodnotitelia/actions";
+import { deactivateStaff, inviteReviewer, reactivateStaff } from "@/app/admin/hodnotitelia/actions";
 import type { AdminReviewer } from "@/components/admin-dashboard";
 import { usePendingFormAction, type FormActionResult } from "@/components/use-pending-form-action";
 
@@ -24,7 +24,8 @@ function InvitationForm({ onResult }: { onResult: (result: FormActionResult) => 
 }
 
 function StaffRow({ reviewer, onResult }: { reviewer: AdminReviewer; onResult: (result: FormActionResult) => void }) {
-  const { pending, formAction } = usePendingFormAction(deactivateStaff, onResult, "Deaktivácia zlyhala");
+  const action = reviewer.is_active ? deactivateStaff : reactivateStaff;
+  const { pending, formAction } = usePendingFormAction(action, onResult, reviewer.is_active ? "Deaktivácia zlyhala" : "Aktivácia zlyhala");
   return (
     <Paper sx={{ p: 2, mb: 1, borderRadius: 2, opacity: reviewer.is_active ? 1 : .6 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
@@ -33,14 +34,21 @@ function StaffRow({ reviewer, onResult }: { reviewer: AdminReviewer; onResult: (
         <Chip size="small" label={reviewer.is_active ? "Aktívny" : "Deaktivovaný"} color={reviewer.is_active ? "success" : "default"} />
       </Box>
       <Typography variant="body2" color="text.secondary">{reviewer.email} · čaká: {reviewer.pending_count} · hotovo: {reviewer.completed_count}</Typography>
-      {reviewer.is_active && (
-        <Box component="form" action={formAction} sx={{ mt: 1 }}>
-          <input type="hidden" name="profileId" value={reviewer.id} />
-          <Button type="submit" size="small" color="error" disabled={pending} startIcon={pending ? <CircularProgress size={16} color="inherit" /> : undefined}>
-            {pending ? "Deaktivujem…" : "Deaktivovať prístup"}
-          </Button>
-        </Box>
-      )}
+      <Box component="form" action={formAction} sx={{ mt: 1 }}>
+        <input type="hidden" name="profileId" value={reviewer.id} />
+        <Button
+          type="submit"
+          size="small"
+          color={reviewer.is_active ? "error" : "success"}
+          variant={reviewer.is_active ? "text" : "outlined"}
+          disabled={pending}
+          startIcon={pending ? <CircularProgress size={16} color="inherit" /> : undefined}
+        >
+          {pending
+            ? (reviewer.is_active ? "Deaktivujem…" : "Aktivujem…")
+            : (reviewer.is_active ? "Deaktivovať prístup" : "Aktivovať prístup")}
+        </Button>
+      </Box>
     </Paper>
   );
 }

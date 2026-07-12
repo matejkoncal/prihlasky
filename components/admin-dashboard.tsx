@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import {
   Alert,
   Box,
@@ -21,7 +22,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { assignReviewer, removeAssignment } from "@/app/admin/actions";
+import { assignReviewer, deleteApplication, removeAssignment } from "@/app/admin/actions";
 import { getEvaluationSummary } from "@/lib/evaluation-summary";
 import { usePendingFormAction, type FormActionResult } from "@/components/use-pending-form-action";
 
@@ -105,6 +106,38 @@ function RemoveAssignmentForm({ assignmentId, onResult }: { assignmentId: string
   );
 }
 
+function DeleteApplicationForm({ applicationId, applicantName, onResult }: {
+  applicationId: string;
+  applicantName: string;
+  onResult: (result: FormActionResult) => void;
+}) {
+  const { pending, formAction } = usePendingFormAction(deleteApplication, onResult, "Prihlášku sa nepodarilo zmazať");
+  return (
+    <Box
+      component="form"
+      action={formAction}
+      onSubmit={(event) => {
+        if (!window.confirm(`Naozaj chcete natrvalo zmazať prihlášku žiaka ${applicantName}? Zmažú sa aj všetky hodnotenia a prílohy.`)) {
+          event.preventDefault();
+        }
+      }}
+    >
+      <input type="hidden" name="applicationId" value={applicationId} />
+      <Button
+        type="submit"
+        size="small"
+        color="error"
+        variant="outlined"
+        disabled={pending}
+        aria-label={`Zmazať prihlášku ${applicantName}`}
+        startIcon={pending ? <CircularProgress size={16} color="inherit" /> : <DeleteOutlineIcon />}
+      >
+        {pending ? "Mažem…" : "Zmazať prihlášku"}
+      </Button>
+    </Box>
+  );
+}
+
 export function AdminDashboard({ applications, reviewers }: { applications: AdminApplication[]; reviewers: AdminReviewer[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -140,14 +173,16 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                   </Typography>
                   <Typography variant="caption" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
                 </Box>
-                <Box data-testid="application-metrics" sx={{ display: "flex", alignItems: "center", justifySelf: { xs: "stretch", md: "end" }, gridColumn: { xs: "1 / -1", md: 2 }, gridRow: { xs: 2, md: 1 }, minWidth: 0 }}>
+                <Box data-testid="application-metrics" sx={{ display: "flex", flexDirection: "column", alignItems: { xs: "flex-start", md: "stretch" }, justifySelf: { xs: "stretch", md: "end" }, gridColumn: { xs: "1 / -1", md: 2 }, gridRow: { xs: 2, md: 1 }, minWidth: 0 }}>
                   <Box sx={{ display: "flex", flexShrink: 0, border: "1px solid", borderColor: "divider", borderRadius: 2, bgcolor: "#f8fafc", overflow: "hidden" }}>
                     <SummaryMetric label="Skóre" value={`${summary.totalScore}/${summary.maximumScore}`} />
                     <SummaryMetric label="Pridelené" value={`${assigned}/${application.categories.length}`} accent={assigned === application.categories.length} />
                     <SummaryMetric label="Hotové" value={`${summary.completedCount}/${summary.categoryCount}`} accent={summary.isComplete} />
                   </Box>
-                  {summary.criterion === "met" && <Chip size="small" label="Kritérium splnené" color="success" sx={{ ml: 1.25, fontWeight: 700 }} />}
-                  {summary.criterion === "not-met" && <Chip size="small" label="Kritérium nesplnené" color="error" sx={{ ml: 1.25, fontWeight: 700 }} />}
+                  <Box data-testid="application-result-status" sx={{ minHeight: 24, mt: .75, display: "flex", justifyContent: { xs: "flex-start", md: "flex-end" } }}>
+                    {summary.criterion === "met" && <Chip size="small" label="Kritérium splnené" color="success" sx={{ fontWeight: 700 }} />}
+                    {summary.criterion === "not-met" && <Chip size="small" label="Kritérium nesplnené" color="error" sx={{ fontWeight: 700 }} />}
+                  </Box>
                 </Box>
                 <Stack data-testid="application-actions" direction="row" spacing={.5} sx={{ justifySelf: "end", gridColumn: { xs: 2, md: 3 }, gridRow: 1 }}>
                   {summary.isComplete && summary.categoryCount === 5 && (
@@ -229,6 +264,9 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                       )}
                     </Box>
                   ))}
+                  </Box>
+                  <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+                    <DeleteApplicationForm applicationId={application.id} applicantName={application.applicant_name} onResult={showResult} />
                   </Box>
                 </Box>
               </Collapse>

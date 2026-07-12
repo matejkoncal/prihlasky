@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getVerifiedStaffUser, type StaffAuthClient } from "@/server/staff-auth";
 
@@ -29,4 +30,30 @@ export async function removeAssignment(formData: FormData): Promise<{ error?: st
   if (error) return { error: "Priradenie sa nedá odstrániť" };
   revalidatePath("/admin");
   return { success: "Priradenie bolo odstránené" };
+}
+
+export async function deleteApplication(formData: FormData): Promise<{ error?: string; success?: string }> {
+  const applicationId = formData.get("applicationId");
+  if (typeof applicationId !== "string" || !/^[0-9a-f-]{36}$/i.test(applicationId)) {
+    return { error: "Neplatná prihláška" };
+  }
+
+  const supabase = await requireAdmin();
+  const { data: attachmentPaths, error } = await supabase.rpc("admin_delete_application", {
+    p_application_id: applicationId,
+  });
+  if (error) return { error: "Prihlášku sa nepodarilo zmazať" };
+
+  if (Array.isArray(attachmentPaths) && attachmentPaths.length > 0) {
+    const { error: storageError } = await createAdminSupabaseClient()
+      .storage
+      .from("application-attachments")
+      .remove(attachmentPaths);
+    if (storageError) {
+      console.error("Deleted application, but attachment cleanup failed:", storageError.message);
+    }
+  }
+
+  revalidatePath("/admin");
+  return { success: "Prihláška bola zmazaná" };
 }

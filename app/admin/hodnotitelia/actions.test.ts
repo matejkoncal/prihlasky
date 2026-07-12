@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   inviteUserByEmail: vi.fn(),
   profileUpdate: vi.fn(),
   profileEq: vi.fn(),
+  rpc: vi.fn(),
   revalidatePath: vi.fn(),
 }));
 
@@ -14,7 +15,7 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers({ origin: "https://prihlasky.koncal.sk" })),
 }));
 vi.mock("@/lib/supabase/server", () => ({
-  createServerSupabaseClient: vi.fn(async () => ({})),
+  createServerSupabaseClient: vi.fn(async () => ({ rpc: mocks.rpc })),
 }));
 vi.mock("@/server/staff-auth", () => ({
   getVerifiedStaffUser: vi.fn(async () => ({ id: "admin-id", role: "admin" })),
@@ -26,7 +27,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   })),
 }));
 
-import { inviteReviewer } from "./actions";
+import { inviteReviewer, reactivateStaff } from "./actions";
 
 describe("inviteReviewer", () => {
   beforeEach(() => {
@@ -37,6 +38,7 @@ describe("inviteReviewer", () => {
     });
     mocks.profileUpdate.mockReturnValue({ eq: mocks.profileEq });
     mocks.profileEq.mockResolvedValue({ error: null });
+    mocks.rpc.mockResolvedValue({ error: null });
   });
 
   it("sends the invite to the prefetch-safe acceptance page", async () => {
@@ -50,5 +52,16 @@ describe("inviteReviewer", () => {
       data: { display_name: "Reviewer" },
       redirectTo: "https://prihlasky.koncal.sk/accept-invite",
     });
+  });
+
+  it("reactivates a profile through the protected RPC", async () => {
+    const formData = new FormData();
+    formData.set("profileId", "11111111-1111-1111-1111-111111111111");
+
+    await expect(reactivateStaff(formData)).resolves.toEqual({});
+    expect(mocks.rpc).toHaveBeenCalledWith("admin_reactivate_profile", {
+      p_profile_id: "11111111-1111-1111-1111-111111111111",
+    });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/admin/hodnotitelia");
   });
 });

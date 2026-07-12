@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminDashboard, type AdminApplication, type AdminReviewer } from "./admin-dashboard";
 
-const actions = vi.hoisted(() => ({ assignReviewer: vi.fn(), removeAssignment: vi.fn() }));
+const actions = vi.hoisted(() => ({ assignReviewer: vi.fn(), removeAssignment: vi.fn(), deleteApplication: vi.fn() }));
 
 vi.mock("@/app/admin/actions", () => actions);
 
@@ -11,6 +11,7 @@ afterEach(cleanup);
 beforeEach(() => {
   actions.assignReviewer.mockReset().mockResolvedValue({ success: "Hodnotiteľ bol priradený" });
   actions.removeAssignment.mockReset().mockResolvedValue({ success: "Priradenie bolo odstránené" });
+  actions.deleteApplication.mockReset().mockResolvedValue({ success: "Prihláška bola zmazaná" });
 });
 
 const applications: AdminApplication[] = [{
@@ -119,6 +120,32 @@ describe("AdminDashboard", () => {
       "href",
       "/admin/prihlasky/66666666-6666-6666-6666-666666666666/hodnotenie.pdf",
     );
+    expect(metrics).toHaveStyle({ flexDirection: "column" });
+    expect(screen.getByTestId("application-result-status")).toHaveStyle({ minHeight: "24px" });
+  });
+
+  it("keeps an empty result row reserved for unfinished applications", () => {
+    render(<AdminDashboard applications={applications} reviewers={reviewers} />);
+
+    const status = screen.getByTestId("application-result-status");
+    expect(status).toHaveStyle({ minHeight: "24px" });
+    expect(within(status).queryByText(/Kritérium/)).not.toBeInTheDocument();
+  });
+
+  it("requires confirmation before permanently deleting an application", async () => {
+    const user = userEvent.setup();
+    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
+    render(<AdminDashboard applications={applications} reviewers={reviewers} />);
+    await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
+
+    const deleteButton = screen.getByRole("button", { name: "Zmazať prihlášku Ján Žiak" });
+    await user.click(deleteButton);
+    expect(actions.deleteApplication).not.toHaveBeenCalled();
+
+    await user.click(deleteButton);
+    await waitFor(() => expect(actions.deleteApplication).toHaveBeenCalledTimes(1));
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining("Ján Žiak"));
+    confirm.mockRestore();
   });
 
   it("shows stored application documents only inside the expanded detail", async () => {
