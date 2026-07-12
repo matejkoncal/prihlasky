@@ -116,10 +116,11 @@ describe("AdminDashboard", () => {
     expect(within(metrics).getByText("Hotové")).toBeInTheDocument();
     expect(screen.getByText("Kritérium splnené")).toBeInTheDocument();
     expect(screen.getByTestId("application-actions")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Exportovať hodnotenie PDF/ })).toHaveAttribute(
+    expect(within(identity).getByRole("link", { name: /Exportovať hodnotenie PDF/ })).toHaveAttribute(
       "href",
       "/admin/prihlasky/66666666-6666-6666-6666-666666666666/hodnotenie.pdf",
     );
+    expect(within(screen.getByTestId("application-actions")).queryByRole("link", { name: /Exportovať hodnotenie PDF/ })).not.toBeInTheDocument();
     expect(metrics).toHaveStyle({ flexDirection: "column" });
     expect(screen.getByTestId("application-result-status")).toHaveStyle({ minHeight: "24px" });
   });

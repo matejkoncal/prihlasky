@@ -166,12 +166,30 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
           return (
             <Paper key={application.id} variant="outlined" sx={{ borderRadius: 3, overflow: "hidden", borderColor: expanded ? "primary.main" : "#dfe7ef", boxShadow: expanded ? "0 10px 30px rgba(16,47,74,.08)" : "0 3px 14px rgba(16,47,74,.035)", transition: "border-color .2s, box-shadow .2s" }}>
               <Box sx={{ p: { xs: 2, md: 2.25 }, display: "grid", gridTemplateColumns: { xs: "minmax(0,1fr) auto", md: "minmax(260px,1.2fr) minmax(390px,auto) auto" }, alignItems: "center", columnGap: { xs: 1.5, md: 2.5 }, rowGap: 1.5 }}>
-                <Box data-testid="application-identity" sx={{ minWidth: 0, gridColumn: 1, gridRow: 1 }}>
-                  <Typography variant="h6" noWrap sx={{ fontWeight: 750 }}>{application.applicant_name}</Typography>
-                  <Typography variant="body2" noWrap color="text.secondary" sx={{ mt: .15 }}>
-                    {[application.class_name, application.field_of_study].filter(Boolean).join(" · ") || "Trieda a odbor neuvedené"}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
+                <Box data-testid="application-identity" sx={{ minWidth: 0, gridColumn: 1, gridRow: 1, display: "flex", alignItems: "center", gap: 1.5 }}>
+                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                    <Typography variant="h6" noWrap sx={{ fontWeight: 750 }}>{application.applicant_name}</Typography>
+                    <Typography variant="body2" noWrap color="text.secondary" sx={{ mt: .15 }}>
+                      {[application.class_name, application.field_of_study].filter(Boolean).join(" · ") || "Trieda a odbor neuvedené"}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">Odoslané {new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(application.submitted_at))}</Typography>
+                  </Box>
+                  {summary.isComplete && summary.categoryCount === 5 && (
+                    <Tooltip title="Exportovať hodnotenie PDF">
+                      <Button
+                        component="a"
+                        href={`/admin/prihlasky/${application.id}/hodnotenie.pdf`}
+                        color="success"
+                        variant="outlined"
+                        size="small"
+                        aria-label={`Exportovať hodnotenie PDF pre ${application.applicant_name}`}
+                        startIcon={<PictureAsPdfOutlinedIcon />}
+                        sx={{ flexShrink: 0, minWidth: 0 }}
+                      >
+                        PDF
+                      </Button>
+                    </Tooltip>
+                  )}
                 </Box>
                 <Box data-testid="application-metrics" sx={{ display: "flex", flexDirection: "column", alignItems: { xs: "flex-start", md: "stretch" }, justifySelf: { xs: "stretch", md: "end" }, gridColumn: { xs: "1 / -1", md: 2 }, gridRow: { xs: 2, md: 1 }, minWidth: 0 }}>
                   <Box sx={{ display: "flex", flexShrink: 0, border: "1px solid", borderColor: "divider", borderRadius: 2, bgcolor: "#f8fafc", overflow: "hidden" }}>
@@ -185,18 +203,6 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                   </Box>
                 </Box>
                 <Stack data-testid="application-actions" direction="row" spacing={.5} sx={{ justifySelf: "end", gridColumn: { xs: 2, md: 3 }, gridRow: 1 }}>
-                  {summary.isComplete && summary.categoryCount === 5 && (
-                    <Tooltip title="Exportovať hodnotenie PDF">
-                      <IconButton
-                        component="a"
-                        href={`/admin/prihlasky/${application.id}/hodnotenie.pdf`}
-                        color="success"
-                        aria-label={`Exportovať hodnotenie PDF pre ${application.applicant_name}`}
-                      >
-                        <PictureAsPdfOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
                   <Tooltip title={expanded ? "Skryť detail" : "Zobraziť detail"}>
                     <IconButton
                       color="primary"
