@@ -42,7 +42,7 @@ function evaluatedApplication(scores: Array<number | null>, completedCount: numb
       reviewer_email: null,
       status: index < completedCount ? "completed" : "pending",
       score,
-      comment: "",
+      comment: index < completedCount ? `Komentár ${index + 1}` : "",
       submitted_at: index < completedCount ? "2026-07-11T08:00:00Z" : null,
     })),
   };
@@ -84,7 +84,8 @@ describe("AdminDashboard", () => {
     render(<AdminDashboard applications={applications} reviewers={reviewers} />);
     await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
 
-    expect(screen.getByTestId("category-row")).toHaveStyle({ minHeight: "104px", alignItems: "center" });
+    expect(screen.getByTestId("category-row")).toHaveStyle({ minHeight: "96px", alignItems: "center" });
+    expect(screen.getByTestId("category-index")).toHaveTextContent("1");
   });
 
   it("shows action feedback in a viewport snackbar", async () => {
@@ -128,6 +129,7 @@ describe("AdminDashboard", () => {
     await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
 
     expect(screen.getByText("Dokumenty")).toBeInTheDocument();
+    expect(screen.getByTestId("application-documents")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Stiahnuť životopis" })).toHaveAttribute(
       "href",
       "/admin/prihlasky/11111111-1111-1111-1111-111111111111/prilohy/cv",
@@ -136,6 +138,17 @@ describe("AdminDashboard", () => {
       "href",
       "/admin/prihlasky/11111111-1111-1111-1111-111111111111/prilohy/motivation_letter",
     );
+  });
+
+  it("separates completed reviewer, score, and comment hierarchy", async () => {
+    const user = userEvent.setup();
+    render(<AdminDashboard applications={[evaluatedApplication([10, 8, 7, 5, 5], 5)]} reviewers={reviewers} />);
+    await user.click(screen.getByRole("button", { name: /zobraziť detail/i }));
+
+    const firstRow = screen.getAllByTestId("category-row")[0];
+    expect(within(firstRow).getByText("Hodnotiteľ 1")).toBeInTheDocument();
+    expect(within(firstRow).getByText("10/10")).toBeInTheDocument();
+    expect(within(firstRow).getByText("Komentár 1")).toBeInTheDocument();
   });
 
   it("does not offer an evaluation PDF unless exactly five reviews are complete", () => {

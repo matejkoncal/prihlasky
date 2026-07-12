@@ -177,14 +177,14 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
               </Box>
 
               <Collapse in={expanded} unmountOnExit>
-                <Box sx={{ px: { xs: 2, md: 3 }, pb: 3, pt: 1, bgcolor: "grey.50", borderTop: "1px solid", borderColor: "divider" }}>
-                  <Box sx={{ my: 2, p: 2, bgcolor: "background.paper", border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 750, mb: .5 }}>Dokumenty</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                      {application.class_name || "Trieda neuvedená"} · {application.field_of_study || "Odbor neuvedený"}
-                    </Typography>
+                <Box sx={{ px: { xs: 2, md: 3 }, pb: 3, pt: 2.5, bgcolor: "#f8fafc", borderTop: "1px solid", borderColor: "divider" }}>
+                  <Box data-testid="application-documents" sx={{ mb: 2, p: 1.75, display: "flex", alignItems: { xs: "flex-start", sm: "center" }, flexDirection: { xs: "column", sm: "row" }, gap: 1.5, bgcolor: "rgba(22,114,196,.055)", border: "1px solid rgba(22,114,196,.14)", borderRadius: 2.5 }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Dokumenty</Typography>
+                      <Typography variant="body2" color="text.secondary">Životopis a motivačný list priložené k prihláške</Typography>
+                    </Box>
                     {(application.attachments ?? []).length > 0 ? (
-                      <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                      <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
                         {(application.attachments ?? []).map((attachment) => (
                           <Button
                             key={attachment.kind}
@@ -203,14 +203,25 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                       <Typography variant="body2" color="text.secondary">K tejto prihláške nie sú uložené žiadne prílohy.</Typography>
                     )}
                   </Box>
-                  {application.categories.map((category) => (
-                    <Box data-testid="category-row" key={category.id} sx={{ py: 1.5, minHeight: 104, display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.35fr) minmax(360px, .65fr)" }, alignItems: "center", gap: { xs: 1.5, md: 3 }, borderBottom: "1px solid", borderColor: "divider" }}>
-                      <Typography sx={{ fontWeight: 700, pr: { md: 2 } }}>{category.name}</Typography>
+                  <Box sx={{ overflow: "hidden", bgcolor: "background.paper", border: "1px solid", borderColor: "divider", borderRadius: 2.5 }}>
+                  {application.categories.map((category, index) => (
+                    <Box data-testid="category-row" key={category.id} sx={{ px: { xs: 1.5, md: 2 }, py: 1.25, minHeight: 96, display: "grid", gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.15fr) minmax(380px, .85fr)" }, alignItems: "center", gap: { xs: 1.5, md: 3 }, borderBottom: index === application.categories.length - 1 ? 0 : "1px solid", borderColor: "divider" }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
+                        <Box data-testid="category-index" sx={{ width: 30, height: 30, flexShrink: 0, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: "#e9f3fb", color: "primary.main", fontSize: 13, fontWeight: 850 }}>{index + 1}</Box>
+                        <Typography sx={{ fontWeight: 750, lineHeight: 1.35 }}>{category.name}</Typography>
+                      </Box>
                       {category.status === "completed" ? (
-                        <Box><Chip size="small" color="success" label="Hotovo" sx={{ mr: 1 }} /><Typography component="span">{category.reviewer_name ?? category.reviewer_email}, {category.score}/10 — {category.comment || "bez komentára"}</Typography></Box>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: .45 }}>
+                            <Chip size="small" color="success" label="Hotovo" sx={{ height: 24 }} />
+                            <Typography sx={{ flexGrow: 1, minWidth: 0, fontWeight: 700 }} noWrap>{category.reviewer_name ?? category.reviewer_email}</Typography>
+                            <Typography sx={{ fontWeight: 850, color: "success.dark" }}>{`${category.score}/10`}</Typography>
+                          </Stack>
+                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.45 }}>{category.comment || "Bez slovného komentára"}</Typography>
+                        </Box>
                       ) : category.assignment_id ? (
                         <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ alignItems: { sm: "center" } }}>
-                          <Typography sx={{ flexGrow: 1 }}>Čaká na: {category.reviewer_name ?? category.reviewer_email}</Typography>
+                          <Box sx={{ flexGrow: 1 }}><Typography variant="caption" color="text.secondary">Čaká na hodnotenie</Typography><Typography sx={{ fontWeight: 700 }}>{category.reviewer_name ?? category.reviewer_email}</Typography></Box>
                           <RemoveAssignmentForm assignmentId={category.assignment_id} onResult={showResult} />
                         </Stack>
                       ) : (
@@ -218,6 +229,7 @@ export function AdminDashboard({ applications, reviewers }: { applications: Admi
                       )}
                     </Box>
                   ))}
+                  </Box>
                 </Box>
               </Collapse>
             </Paper>
