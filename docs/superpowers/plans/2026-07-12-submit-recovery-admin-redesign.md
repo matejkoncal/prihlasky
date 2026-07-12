@@ -21,6 +21,7 @@
 ### Task 1: Safe production deployment and submit regression
 
 **Files:**
+
 - Create: `scripts/deploy-production.sh`
 - Modify: `package.json`
 - Create: `server/production-deploy.test.ts`
@@ -28,6 +29,7 @@
 - Test: `server/submit-application.test.ts`
 
 **Interfaces:**
+
 - Produces: `npm run deploy:production`, which executes `npx vercel --prod --yes` without runtime `-e` or build `-b` secret overrides.
 - Consumes: Supabase and Resend Production variables configured in the linked Vercel project.
 
@@ -41,12 +43,14 @@
 ### Task 2: Compact responsive staff appbar
 
 **Files:**
+
 - Modify: `components/staff-layout.tsx`
 - Modify: `components/staff-layout.test.tsx`
 - Modify: `components/staff-navigation.tsx`
 - Modify: `components/staff-navigation.test.tsx`
 
 **Interfaces:**
+
 - `StaffLayout` continues to consume `VerifiedStaffUser` and children.
 - Appbar exposes accessible logo, user name, role, initials avatar, navigation, and `Odhlásiť sa` tooltip/action.
 
@@ -59,10 +63,12 @@
 ### Task 3: Stable application summary cards
 
 **Files:**
+
 - Modify: `components/admin-dashboard.tsx`
 - Modify: `components/admin-dashboard.test.tsx`
 
 **Interfaces:**
+
 - Each card header has `data-testid` zones `application-identity`, `application-metrics`, and `application-actions` with explicit desktop grid columns.
 - Metrics render labelled values for score, assigned categories, and completed categories.
 - PDF and expand actions remain icon links/buttons with accessible labels.
@@ -76,10 +82,12 @@
 ### Task 4: Refined expanded detail and production verification
 
 **Files:**
+
 - Modify: `components/admin-dashboard.tsx`
 - Modify: `components/admin-dashboard.test.tsx`
 
 **Interfaces:**
+
 - Expanded category rows expose a numbered marker, category title, and a consistent reviewer/status area.
 - Existing assignment forms and protected document links remain unchanged functionally.
 

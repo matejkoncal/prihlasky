@@ -22,12 +22,14 @@
 ### Task 1: Active administrator navigation
 
 **Files:**
+
 - Create: `components/staff-navigation.tsx`
 - Create: `components/staff-navigation.test.tsx`
 - Modify: `components/staff-layout.tsx`
 - Modify: `components/staff-layout.test.tsx`
 
 **Interfaces:**
+
 - Produces: `StaffNavigation(): ReactElement`, visible only inside the administrator layout
 - Consumes: `usePathname()` and the routes `/admin` and `/admin/hodnotitelia`
 
@@ -54,12 +56,14 @@ Expected: all navigation and layout tests PASS.
 ### Task 2: Aggregate evaluation summary
 
 **Files:**
+
 - Create: `lib/evaluation-summary.ts`
 - Create: `lib/evaluation-summary.test.ts`
 - Modify: `components/admin-dashboard.tsx`
 - Modify: `components/admin-dashboard.test.tsx`
 
 **Interfaces:**
+
 - Produces: `getEvaluationSummary(categories)` returning `{ totalScore, maximumScore, completedCount, categoryCount, isComplete, criterion: "pending" | "met" | "not-met" }`
 - Consumes: category objects containing `status: "pending" | "completed" | null` and `score: number | null`
 
@@ -94,11 +98,13 @@ Expected: helper and card UI tests PASS.
 ### Task 3: Pending assignment actions
 
 **Files:**
+
 - Create: `components/use-pending-form-action.ts`
 - Modify: `components/admin-dashboard.tsx`
 - Modify: `components/admin-dashboard.test.tsx`
 
 **Interfaces:**
+
 - Produces: `usePendingFormAction(action, onResult, fallbackError)` returning `{ pending, formAction }`
 - Guarantees: a ref-based lock prevents duplicate execution before React rerenders
 
@@ -125,10 +131,12 @@ Expected: all dashboard behavior and pending-state tests PASS.
 ### Task 4: Pending staff management actions
 
 **Files:**
+
 - Modify: `components/reviewer-admin.tsx`
 - Create: `components/reviewer-admin.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `usePendingFormAction`, `inviteReviewer`, and `deactivateStaff`
 - Produces: isolated invitation and deactivation pending states
 
@@ -159,10 +167,12 @@ Expected: invitation and deactivation tests PASS.
 ### Task 5: Approved evaluation category migration
 
 **Files:**
+
 - Create: `supabase/migrations/20260711110000_rename_evaluation_categories.sql`
 - Create: `server/evaluation-categories-migration.test.ts`
 
 **Interfaces:**
+
 - Updates rows by stable slugs `category-1` through `category-5`
 - Produces the five exact Slovak names from the approved design
 
@@ -193,6 +203,7 @@ Run: `npx supabase db push --linked --yes`, then query `evaluation_categories` t
 ### Task 6: Full verification and Production release
 
 **Files:**
+
 - Modify: none beyond Tasks 1–5
 
 - [ ] **Step 1: Run full verification**

@@ -30,7 +30,7 @@ Supabase dostane privátny bucket `application-attachments` a tabuľku `applicat
 
 Bucket nebude verejný. Klient nedostane service-role kľúč ani internú Storage cestu. Admin zoznam bude obsahovať iba bezpečné metadáta potrebné na vykreslenie tlačidiel.
 
-Nové prihlášky budú vo `form_data` ukladať triedu a odbor oddelene. Pole `classField` ostane zachované pre existujúci PDF formulár a spätnú kompatibilitu. Pri starších záznamoch export rozdelí `classField` na prvom oddeľovači ` – `.
+Nové prihlášky budú vo `form_data` ukladať triedu a odbor oddelene. Pole `classField` ostane zachované pre existujúci PDF formulár a spätnú kompatibilitu. Pri starších záznamoch export rozdelí `classField` na prvom oddeľovači `–`.
 
 ## Odoslanie prihlášky
 

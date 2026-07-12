@@ -8,9 +8,15 @@ import { StaffLayout } from "@/components/staff-layout";
 export const dynamic = "force-dynamic";
 
 export default async function ReviewerPage() {
-  const supabase = await createServerSupabaseClient();
-  const user = await getVerifiedStaffUser(supabase as unknown as StaffAuthClient);
-  if (!user) redirect("/login");
-  const assignments = await getMyReviewAssignments(supabase as unknown as ReviewSupabaseClient);
-  return <StaffLayout user={user}><ReviewerDashboard assignments={assignments} /></StaffLayout>;
+	const supabase = await createServerSupabaseClient();
+	const user = await getVerifiedStaffUser(supabase as unknown as StaffAuthClient);
+	if (!user) {
+		redirect("/login");
+	}
+	const assignments = await getMyReviewAssignments(supabase as unknown as ReviewSupabaseClient);
+	return (
+		<StaffLayout user={user}>
+			<ReviewerDashboard assignments={assignments} />
+		</StaffLayout>
+	);
 }

@@ -18,6 +18,7 @@
 ### Task 1: Add profile activity state and database guards
 
 **Files:**
+
 - Create: `supabase/migrations/<timestamp>_staff_activity.sql`
 - Modify: `supabase/tests/application_review_system.test.sql`
 
@@ -28,6 +29,7 @@
 ### Task 2: Add role selection, safe deactivation, and logout
 
 **Files:**
+
 - Modify: `server/staff-auth.ts`
 - Modify: `app/admin/hodnotitelia/actions.ts`
 - Modify: `components/reviewer-admin.tsx`
@@ -41,6 +43,7 @@
 ### Task 3: Unify staff navigation and improve internal UI
 
 **Files:**
+
 - Create: `components/staff-layout.tsx`
 - Modify: `app/admin/page.tsx`
 - Modify: `app/admin/hodnotitelia/page.tsx`
@@ -56,6 +59,7 @@
 ### Task 4: Verify and deploy Preview
 
 **Files:**
+
 - Modify: `docs/supabase-first-admin.md`
 
 - [ ] Document deactivation behaviour and custom SMTP requirement.

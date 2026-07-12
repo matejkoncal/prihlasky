@@ -23,6 +23,7 @@
 ### Task 1: Next.js shell and client form
 
 **Files:**
+
 - Create: `app/layout.tsx`
 - Create: `app/page.tsx`
 - Create: `app/globals.css`
@@ -42,6 +43,7 @@
 - Create: `public/logos/eu-co-funded-sk.png`
 
 **Interfaces:**
+
 - Consumes: browser `fetch('/api/submit', { method: 'POST' })` and the current form/asset behaviour from `web/src/App.tsx`.
 - Produces: default `ApplicationForm` Client Component and JSON `ApplicationPayload` containing current fields plus optional `{ name: string; content: string }` attachments.
 
@@ -100,6 +102,7 @@ Run `git add package.json package-lock.json app components test vitest.config.ts
 ### Task 2: Validated server domain and PDF/email generation
 
 **Files:**
+
 - Create: `server/application-types.ts`
 - Create: `server/application-validation.ts`
 - Create: `server/application-validation.test.ts`
@@ -109,6 +112,7 @@ Run `git add package.json package-lock.json app components test vitest.config.ts
 - Create: `server/application-pdf.test.tsx`
 
 **Interfaces:**
+
 - Produces: `ApplicationPayload`, `ValidatedApplication`, `FileAttachment`, `STUDENT_SITUATIONS`, `validateApplication(input: unknown): ValidationResult`, `createSchoolEmail(data, pdfBase64): EmailMessage`, `createApplicantConfirmationEmail(email): EmailMessage`, and `ApplicationPdf({ data })`.
 - Consumes: official logos from `public/logos`, FormePDF React primitives, and escaped values from validated application data.
 
@@ -147,12 +151,14 @@ Run `npm test -- server && npm run lint && npm run build`. Expected: all server 
 ### Task 3: Route Handler and submission orchestration
 
 **Files:**
+
 - Create: `server/submit-application.ts`
 - Create: `server/submit-application.test.ts`
 - Create: `app/api/submit/route.ts`
 - Create: `app/api/submit/route.test.ts`
 
 **Interfaces:**
+
 - Produces: `submitApplication(input: unknown, dependencies: SubmissionDependencies): Promise<SubmissionResult>` and `POST(request: Request): Promise<Response>`.
 - Consumes: `validateApplication`, `ApplicationPdf`, `renderDocument`, `createSchoolEmail`, `createApplicantConfirmationEmail`, `Resend`, and `process.env.RESEND_API_KEY`.
 
@@ -175,6 +181,7 @@ Run `npm test -- server/submit-application.test.ts app/api/submit/route.test.ts 
 ### Task 4: Remove legacy applications, verify, and deploy Preview
 
 **Files:**
+
 - Delete: `web/`
 - Delete: `functions/`
 - Delete: `api/`
@@ -186,6 +193,7 @@ Run `npm test -- server/submit-application.test.ts app/api/submit/route.test.ts 
 - Modify: `docs/superpowers/plans/2026-07-10-nextjs-vercel-migration.md`
 
 **Interfaces:**
+
 - Produces: one root Next.js application, a documented `RESEND_API_KEY` requirement, and a Vercel Preview URL.
 - Consumes: all green root tests and the authenticated Vercel CLI session.
 

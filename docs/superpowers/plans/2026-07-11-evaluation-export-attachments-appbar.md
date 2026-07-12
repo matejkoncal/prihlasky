@@ -23,11 +23,13 @@
 ### Task 1: Supabase attachment schema and admin export data
 
 **Files:**
+
 - Create: `supabase/migrations/20260711210000_application_attachments_and_exports.sql`
 - Modify: `supabase/tests/application_review_system.test.sql`
 - Create: `server/application-attachments-migration.test.ts`
 
 **Interfaces:**
+
 - Produces: private bucket `application-attachments`, table `public.application_attachments`, extended `public.admin_list_applications()`, RPC `public.admin_get_application_export(uuid)`.
 - `admin_list_applications()` returns `class_name`, `field_of_study`, and `attachments` alongside current columns.
 - `admin_get_application_export(uuid)` returns one JSON object with applicant fields and ordered completed categories, and raises `P0001` unless the count is exactly five.
@@ -42,6 +44,7 @@
 ### Task 2: Structured class data and attachment persistence
 
 **Files:**
+
 - Modify: `components/application-form.tsx`
 - Modify: `server/application-types.ts`
 - Modify: `server/application-validation.ts`
@@ -55,12 +58,13 @@
 - Modify: `app/api/submit/route.test.ts`
 
 **Interfaces:**
+
 - `ValidatedApplication` gains `className: string` and `fieldOfStudy: string` while retaining `classField`.
 - `ApplicationAttachmentRepository.store(applicationId, data)` stores present `cv` and `motivationLetter`; `removeAll(applicationId)` removes stored objects and metadata.
 - Storage paths use `${applicationId}/${kind}-${crypto.randomUUID()}.${extension}` and derive MIME from `.pdf` or `.docx`.
 - `SubmissionDependencies` gains `attachments: ApplicationAttachmentRepository`.
 
-- [ ] Add failing validation and form payload tests proving separate `className` and `fieldOfStudy` are submitted and old `classField` payloads still normalize by splitting on ` – `.
+- [ ] Add failing validation and form payload tests proving separate `className` and `fieldOfStudy` are submitted and old `classField` payloads still normalize by splitting on `–`.
 - [ ] Run the targeted validation/form tests and verify the new assertions fail.
 - [ ] Implement normalized structured class fields without changing the rendered public form.
 - [ ] Add failing repository tests for two uploads, metadata inserts, safe random paths, and `removeAll` cleanup.
@@ -75,6 +79,7 @@
 ### Task 3: Staff identity in the shared appbar
 
 **Files:**
+
 - Modify: `server/staff-auth.ts`
 - Modify: `server/staff-auth.test.ts`
 - Modify: `components/staff-layout.tsx`
@@ -85,6 +90,7 @@
 - Modify: affected page tests under `app/admin`, `app/admin/hodnotitelia`, and `app/hodnotenie`.
 
 **Interfaces:**
+
 - `VerifiedStaffUser` becomes `{ id, role, displayName, email }`.
 - `StaffLayout` accepts `{ user: VerifiedStaffUser; children: ReactNode }`.
 
@@ -97,12 +103,14 @@
 ### Task 4: Admin attachment download route
 
 **Files:**
+
 - Create: `app/admin/prihlasky/[applicationId]/prilohy/[kind]/route.ts`
 - Create: `app/admin/prihlasky/[applicationId]/prilohy/[kind]/route.test.ts`
 - Create: `server/admin-download-auth.ts`
 - Create: `server/admin-download-auth.test.ts`
 
 **Interfaces:**
+
 - `requireActiveAdmin()` returns the verified admin or a controlled 401/403 response.
 - `GET` accepts UUID `applicationId` and `kind` equal to `cv` or `motivation_letter`.
 - Success returns stored bytes with authoritative MIME, `Content-Length`, `X-Content-Type-Options: nosniff`, and RFC 5987-safe `Content-Disposition`.
@@ -116,6 +124,7 @@
 ### Task 5: Evaluation PDF and protected export route
 
 **Files:**
+
 - Create: `server/evaluation-export-types.ts`
 - Create: `server/evaluation-pdf.tsx`
 - Create: `server/evaluation-pdf.test.tsx`
@@ -123,6 +132,7 @@
 - Create: `app/admin/prihlasky/[applicationId]/hodnotenie.pdf/route.test.ts`
 
 **Interfaces:**
+
 - `EvaluationExportData` contains `applicantName`, `className`, `fieldOfStudy`, and five ordered `{ categoryName, reviewerName, score, comment }` rows.
 - `EvaluationPdf({ data })` returns a FormePDF document.
 - Export `GET` invokes `admin_get_application_export`, renders with `renderDocument`, and streams `application/pdf`; incomplete RPC errors map to 409.
@@ -139,11 +149,13 @@
 ### Task 6: Admin card document and export controls
 
 **Files:**
+
 - Modify: `components/admin-dashboard.tsx`
 - Modify: `components/admin-dashboard.test.tsx`
 - Modify: `app/admin/page.tsx` only if RPC typing changes require it.
 
 **Interfaces:**
+
 - `AdminApplication` gains `class_name`, `field_of_study`, and `attachments: Array<{ kind, original_filename }>`.
 - Attachment links point to the protected routes and use `download` semantics.
 - Evaluation export link appears only when `getEvaluationSummary(...).isComplete` and the category count is five.
@@ -157,9 +169,11 @@
 ### Task 7: Remote migration, full verification, and production deployment
 
 **Files:**
+
 - No new source files expected.
 
 **Interfaces:**
+
 - Remote Supabase project `edbccqxhyinlqtpwxtvb` receives the committed migration.
 - Production alias remains `https://prihlasky.koncal.sk`.
 

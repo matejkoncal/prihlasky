@@ -21,10 +21,12 @@
 ### Task 1: Authenticated login routing
 
 **Files:**
+
 - Modify: `app/login/page.tsx`
 - Create: `app/login/page.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `createServerSupabaseClient()` and `getVerifiedStaffUser(client)`
 - Produces: server-rendered login behavior with `/admin` and `/hodnotenie` redirects
 
@@ -63,10 +65,12 @@ Expected: all login page tests PASS.
 ### Task 2: Server-side invite verification
 
 **Files:**
+
 - Modify: `app/auth/confirm/route.ts`
 - Create: `app/auth/confirm/route.test.ts`
 
 **Interfaces:**
+
 - Produces: `confirmInvite(request: NextRequest, supabase: InviteAuthClient): Promise<NextResponse>`
 - Calls: `supabase.auth.verifyOtp({ token_hash: string, type: "invite" })`
 
@@ -108,10 +112,12 @@ Expected: all invite handler tests PASS.
 ### Task 3: Branded hosted invite email
 
 **Files:**
+
 - Create: `supabase/templates/invite.html`
 - Create: `server/invite-email-template.test.ts`
 
 **Interfaces:**
+
 - Template variables: `{{ .RedirectTo }}`, `{{ .TokenHash }}`
 - Final CTA URL: `{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=invite`
 
@@ -151,9 +157,11 @@ Fetch the config again and assert the two fields match while SMTP-related fields
 ### Task 4: Verification and production release
 
 **Files:**
+
 - Modify: none beyond Tasks 1–3
 
 **Interfaces:**
+
 - Production URL: `https://prihlasky.koncal.sk`
 
 - [ ] **Step 1: Run complete verification**

@@ -21,10 +21,12 @@
 ### Task 1: Safe invitation acceptance page
 
 **Files:**
+
 - Create: `app/accept-invite/page.tsx`
 - Create: `app/accept-invite/page.test.tsx`
 
 **Interfaces:**
+
 - Consumes: async `searchParams` containing optional `token_hash`.
 - Produces: a form with `method="post"`, `action="/auth/confirm"`, hidden `token_hash`, and submit label `Prijať pozvánku a nastaviť heslo`.
 
@@ -49,12 +51,14 @@ Run the Task 1 test command again. Expected: all page tests PASS.
 ### Task 2: POST confirmation and invitation redirect
 
 **Files:**
+
 - Modify: `app/auth/confirm/route.ts`
 - Modify: `app/auth/confirm/route.test.ts`
 - Modify: `app/admin/hodnotitelia/actions.ts`
 - Create: `app/admin/hodnotitelia/actions.test.ts`
 
 **Interfaces:**
+
 - Adds `POST(request: NextRequest)` reading `token_hash` from `request.formData()`.
 - Reuses `confirmInvite` with a selectable success redirect status; POST uses 303.
 - `inviteReviewer` passes `${origin}/accept-invite` as `redirectTo`.
@@ -84,6 +88,7 @@ Run the Task 2 test command again. Expected: all route and action tests PASS.
 ### Task 3: Hosted Auth configuration
 
 **Files:**
+
 - Modify: none
 
 - [ ] **Step 1: Patch only the redirect allowlist**
@@ -97,6 +102,7 @@ Fetch Auth config again. Require both URLs, exact equality between hosted and lo
 ### Task 4: Verification and Production release
 
 **Files:**
+
 - Modify: none beyond Tasks 1–2
 
 - [ ] **Step 1: Run complete verification**

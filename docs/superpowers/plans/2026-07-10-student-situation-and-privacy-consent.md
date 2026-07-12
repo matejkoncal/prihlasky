@@ -20,6 +20,7 @@
 ### Task 1: Firebase validation rules
 
 **Files:**
+
 - Create: `functions/test/application-validation.test.ts`
 - Create: `functions/src/application-validation.ts`
 - Modify: `functions/package.json`
@@ -27,6 +28,7 @@
 - Modify: `functions/src/index.tsx`
 
 **Interfaces:**
+
 - Produces: `STUDENT_SITUATIONS`, `StudentSituation`, and `validateApplicationExtras(data): string | null`.
 - Consumes: The Express handler validates `req.body` before email validation.
 
@@ -43,27 +45,27 @@ import { describe, expect, it } from "vitest";
 import { STUDENT_SITUATIONS, validateApplicationExtras } from "../src/application-validation";
 
 describe("validateApplicationExtras", () => {
-  it.each(STUDENT_SITUATIONS)("accepts supported situation %s", (studentSituation) => {
+  it.each(STUDENT_SITUATIONS)("accepts supported situation %s", studentSituation => {
     expect(validateApplicationExtras({ studentSituation, personalDataConsent: true })).toBeNull();
   });
 
   it("rejects missing and unsupported situations", () => {
-    expect(validateApplicationExtras({ personalDataConsent: true })).toBe(
-      "Vyberte jednu z uvedených možností",
-    );
-    expect(validateApplicationExtras({
-      studentSituation: "Iná skupina",
-      personalDataConsent: true,
-    })).toBe("Vyberte jednu z uvedených možností");
+    expect(validateApplicationExtras({ personalDataConsent: true })).toBe("Vyberte jednu z uvedených možností");
+    expect(
+      validateApplicationExtras({
+        studentSituation: "Iná skupina",
+        personalDataConsent: true,
+      })
+    ).toBe("Vyberte jednu z uvedených možností");
   });
 
   it("requires explicit boolean consent", () => {
-    expect(validateApplicationExtras({
-      studentSituation: STUDENT_SITUATIONS[0],
-      personalDataConsent: "true",
-    })).toBe(
-      "Na odoslanie prihlášky je potrebný súhlas so spracovaním osobných údajov",
-    );
+    expect(
+      validateApplicationExtras({
+        studentSituation: STUDENT_SITUATIONS[0],
+        personalDataConsent: "true",
+      })
+    ).toBe("Na odoslanie prihlášky je potrebný súhlas so spracovaním osobných údajov");
   });
 });
 ```
@@ -87,14 +89,8 @@ export const STUDENT_SITUATIONS = [
 
 export type StudentSituation = (typeof STUDENT_SITUATIONS)[number];
 
-export function validateApplicationExtras(data: {
-  studentSituation?: unknown;
-  personalDataConsent?: unknown;
-}): string | null {
-  if (
-    typeof data.studentSituation !== "string" ||
-    !STUDENT_SITUATIONS.includes(data.studentSituation as StudentSituation)
-  ) {
+export function validateApplicationExtras(data: { studentSituation?: unknown; personalDataConsent?: unknown }): string | null {
+  if (typeof data.studentSituation !== "string" || !STUDENT_SITUATIONS.includes(data.studentSituation as StudentSituation)) {
     return "Vyberte jednu z uvedených možností";
   }
   if (data.personalDataConsent !== true) {
@@ -115,12 +111,14 @@ Run `cd functions && npm test -- application-validation.test.ts`; expect all val
 ### Task 2: Required form controls and payload
 
 **Files:**
+
 - Create: `web/src/App.test.tsx`
 - Modify: `web/package.json`
 - Modify: `web/package-lock.json`
 - Modify: `web/src/App.tsx`
 
 **Interfaces:**
+
 - Produces: payload fields `studentSituation: string` and `personalDataConsent: boolean`.
 - Consumes: the existing generic form state and `/api/submit` request.
 
@@ -146,9 +144,9 @@ it("shows all situations and enables submit only after consent", async () => {
   expect(screen.getByLabelText("Nepatrím do žiadnej z uvedených skupín")).toBeTruthy();
   const submit = screen.getByRole("button", { name: "Odoslať prihlášku" }) as HTMLButtonElement;
   expect(submit.disabled).toBe(true);
-  await user.click(screen.getByLabelText(
-    "Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške na účely výberového konania projektu Erasmus+.",
-  ));
+  await user.click(
+    screen.getByLabelText("Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške na účely výberového konania projektu Erasmus+.")
+  );
   expect(submit.disabled).toBe(false);
 });
 ```
@@ -185,11 +183,13 @@ Run `cd web && npm test -- App.test.tsx && npm run lint && npm run build`; expec
 ### Task 3: PDF and email output
 
 **Files:**
+
 - Create: `functions/test/pdf-template.test.tsx`
 - Modify: `functions/src/pdf-template.tsx`
 - Modify: `functions/src/index.tsx`
 
 **Interfaces:**
+
 - Consumes: the validated situation and consent fields.
 - Produces: PDF text with the selected situation, consent wording, and `Súhlas udelený: Áno`; email HTML with situation and consent confirmation.
 
@@ -229,9 +229,7 @@ it("includes student situation and privacy consent", () => {
   });
   const text = collectText(document);
   expect(text).toContain("Žiak so zdravotným znevýhodnením");
-  expect(text).toContain(
-    "Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške na účely výberového konania projektu Erasmus+.",
-  );
+  expect(text).toContain("Súhlasím so spracovaním osobných údajov uvedených v tejto prihláške na účely výberového konania projektu Erasmus+.");
   expect(text).toContain("Súhlas udelený: Áno");
 });
 ```
@@ -255,6 +253,7 @@ Run `cd functions && npm test -- pdf-template.test.tsx && npm test && npm run bu
 ### Task 4: Official EU co-funding mark
 
 **Files:**
+
 - Create: `web/src/assets/logos/eu-co-funded-sk.png`
 - Create: `functions/src/assets/eu-co-funded-sk.png`
 - Modify: `web/src/App.test.tsx`
@@ -263,6 +262,7 @@ Run `cd functions && npm test -- pdf-template.test.tsx && npm test && npm run bu
 - Modify: `functions/src/pdf-template.tsx`
 
 **Interfaces:**
+
 - Consumes: official archive `https://ec.europa.eu/regional_policy/sources/information-sources/logo-download-center/co-funded_sk.zip` and member `co-funded_SK/horizontal/RGB/PNG/SK_Co-fundedbytheEU_RGB_POS.png`.
 - Produces: accessible web image with alt text `Spolufinancované Európskou úniou` and a centred PNG data URI in the PDF header.
 
@@ -271,9 +271,7 @@ Run `cd functions && npm test -- pdf-template.test.tsx && npm test && npm run bu
 In `web/src/App.test.tsx`, add:
 
 ```ts
-expect(
-  screen.getByRole("img", { name: "Spolufinancované Európskou úniou" }),
-).toBeTruthy();
+expect(screen.getByRole("img", { name: "Spolufinancované Európskou úniou" })).toBeTruthy();
 ```
 
 In `functions/test/pdf-template.test.tsx`, recursively collect every React element's `src` prop and assert that one starts with `data:image/png;base64,`. Run the focused web and PDF tests; expect both to fail because the co-funding mark is absent.
@@ -308,9 +306,11 @@ Run both focused tests, all web/functions tests, web lint, and both builds. Expe
 ### Task 5: Final verification and deployment push
 
 **Files:**
+
 - Verify: all committed feature, dependency, test, spec, and plan files.
 
 **Interfaces:**
+
 - Produces: verified commits pushed to `origin/main`.
 
 - [ ] **Step 1: Run the complete verification suite**

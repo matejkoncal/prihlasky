@@ -20,10 +20,12 @@
 ### Task 1: Structured assignment actions
 
 **Files:**
+
 - Modify: `app/admin/actions.ts`
 - Test: `app/admin/actions.test.ts`
 
 **Interfaces:**
+
 - Produces: `assignReviewer(formData): Promise<{ error?: string; success?: string }>`
 - Produces: `removeAssignment(formData): Promise<{ error?: string; success?: string }>`
 
@@ -34,10 +36,12 @@
 ### Task 2: Compact expandable application list
 
 **Files:**
+
 - Modify: `components/admin-dashboard.tsx`
 - Create: `components/admin-dashboard.test.tsx`
 
 **Interfaces:**
+
 - Consumes: existing `AdminApplication[]` and `AdminReviewer[]`.
 - Produces: collapsed application summaries, one inline expanded detail, and a fixed Snackbar.
 
@@ -50,10 +54,12 @@
 ### Task 3: Sticky staff navigation and verification
 
 **Files:**
+
 - Modify: `components/staff-layout.tsx`
 - Test: `components/admin-dashboard.test.tsx`
 
 **Interfaces:**
+
 - Produces: an AppBar with `position="sticky"` and `top: 0`.
 
 - [ ] Add a failing assertion for sticky navigation.
@@ -64,6 +70,7 @@
 ### Task 4: Preview deployment
 
 **Files:**
+
 - No source changes.
 
 - [ ] Deploy the verified worktree with existing Preview Supabase environment values.

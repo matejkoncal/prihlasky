@@ -20,11 +20,13 @@
 ### Task 1: Applicant confirmation email
 
 **Files:**
+
 - Create: `functions/src/applicant-confirmation.ts`
 - Create: `functions/test/applicant-confirmation.test.ts`
 - Modify: `functions/src/index.tsx`
 
 **Interfaces:**
+
 - Produces: `createApplicantConfirmationEmail(email: string): { to: string; subject: string; html: string }`.
 - Consumes: the Firebase handler passes `data.email` to the helper after its administrator message succeeds.
 
@@ -76,10 +78,12 @@ Run `cd functions && npm test -- applicant-confirmation.test.ts && npm run build
 ### Task 2: Success screen
 
 **Files:**
+
 - Modify: `web/src/App.test.tsx`
 - Modify: `web/src/App.tsx`
 
 **Interfaces:**
+
 - Consumes: existing `success: boolean` set after the API returns HTTP 200.
 - Produces: a page body showing the success confirmation and no submit button after success.
 

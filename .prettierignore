@@ -1,0 +1,12 @@
+.next
+.vercel
+.worktrees
+node_modules
+coverage
+build
+dist
+functions/lib
+functions/node_modules
+web/dist
+web/node_modules
+supabase/.temp

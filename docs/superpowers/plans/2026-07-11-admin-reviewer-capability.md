@@ -22,6 +22,7 @@
 ### Task 1: Administrator assignment option and navigation
 
 **Files:**
+
 - Modify: `components/admin-dashboard.tsx`
 - Modify: `components/admin-dashboard.test.tsx`
 - Modify: `components/staff-navigation.tsx`
@@ -29,6 +30,7 @@
 - Modify: `components/staff-layout.test.tsx`
 
 **Interfaces:**
+
 - Assignment options consume all `AdminReviewer` rows where `is_active` is true.
 - Admin option labels append ` (admin)` when `role === "admin"`.
 - Administrator navigation adds `/hodnotenie` with label `Moje hodnotenia`.
@@ -58,12 +60,14 @@ Run the Task 1 test command again. Expected: all tests PASS.
 ### Task 2: Administrator reviewer page and submission authorization
 
 **Files:**
+
 - Modify: `app/hodnotenie/page.tsx`
 - Create: `app/hodnotenie/page.test.tsx`
 - Modify: `app/hodnotenie/actions.ts`
 - Create: `app/hodnotenie/actions.test.ts`
 
 **Interfaces:**
+
 - `ReviewerPage` accepts any non-null `VerifiedStaffUser` and passes `user.role` into `StaffLayout`.
 - `submitEvaluation` accepts any non-null verified active user before calling `submit_evaluation`.
 
@@ -92,10 +96,12 @@ Run the Task 2 test command again. Expected: all page and action tests PASS.
 ### Task 3: Hosted assignment function migration
 
 **Files:**
+
 - Create: `supabase/migrations/20260711130000_allow_admin_review_assignments.sql`
 - Create: `server/admin-reviewer-migration.test.ts`
 
 **Interfaces:**
+
 - Replaces `admin_create_assignment(uuid, uuid, uuid)`.
 - Replaces `admin_reassign_assignment(uuid, uuid)`.
 - Both validate `public.profiles.id = p_reviewer_id AND is_active` without a role predicate.
@@ -125,6 +131,7 @@ Run: `npx supabase db push --linked --yes`. Verify the remote migration list con
 ### Task 4: Full verification and production release
 
 **Files:**
+
 - Modify: none beyond Tasks 1–3
 
 - [ ] **Step 1: Run complete verification**

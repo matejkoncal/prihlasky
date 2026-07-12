@@ -1,51 +1,102 @@
 <!doctype html>
 <html lang="sk">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pozvánka do systému Erasmus+</title>
-  </head>
-  <body style="margin:0;padding:0;background:#eef3f8;color:#243b53;font-family:Arial,Helvetica,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef3f8;">
-      <tr>
-        <td align="center" style="padding:36px 16px;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 30px rgba(16,42,67,.12);">
-            <tr>
-              <td style="padding:34px 40px;background:#102a43;color:#ffffff;">
-                <div style="display:inline-block;padding:6px 11px;border:1px solid rgba(255,255,255,.35);border-radius:999px;color:#d9eaff;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;">Erasmus+</div>
-                <h1 style="margin:18px 0 6px;font-size:29px;line-height:1.2;color:#ffffff;">Vitajte v hodnotiacom systéme</h1>
-                <p style="margin:0;color:#c9d8e6;font-size:16px;line-height:1.55;">Prihlášky do programu Erasmus+</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:38px 40px 34px;">
-                <p style="margin:0 0 18px;font-size:17px;line-height:1.65;color:#334e68;">Dobrý deň,</p>
-                <p style="margin:0 0 18px;font-size:17px;line-height:1.65;color:#334e68;">administrátor vás pozval do <strong>systému na hodnotenie prihlášok</strong> do programu Erasmus+.</p>
-                <p style="margin:0 0 28px;font-size:16px;line-height:1.65;color:#486581;">Kliknite na tlačidlo nižšie, nastavte si svoje heslo a potom môžete začať pracovať s pridelenými prihláškami.</p>
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 28px;">
-                  <tr>
-                    <td bgcolor="#147d92" style="border-radius:10px;">
-                      <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=invite" style="display:inline-block;padding:15px 24px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;line-height:1.2;">Nastaviť heslo a vstúpiť do systému</a>
-                    </td>
-                  </tr>
-                </table>
-                <div style="padding:16px 18px;background:#f4f7fb;border-left:4px solid #3eb6c1;border-radius:8px;color:#486581;font-size:14px;line-height:1.55;">
-                  Tento bezpečnostný odkaz je určený iba pre vás, je časovo obmedzený a možno ho použiť iba raz.
-                </div>
-                <p style="margin:28px 0 8px;font-size:13px;line-height:1.5;color:#829ab1;">Ak tlačidlo nefunguje, skopírujte do prehliadača tento odkaz:</p>
-                <p style="margin:0;word-break:break-all;font-size:13px;line-height:1.5;">
-                  <a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=invite" style="color:#147d92;text-decoration:underline;">{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=invite</a>
-                </p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:22px 40px;background:#f8fafc;border-top:1px solid #e6edf3;color:#829ab1;font-size:12px;line-height:1.55;">
-                Ak ste túto pozvánku neočakávali, e-mail môžete bezpečne ignorovať. Na túto správu nie je potrebné odpovedať.
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Pozvánka do systému Erasmus+</title>
+	</head>
+	<body style="margin: 0; padding: 0; background: #eef3f8; color: #243b53; font-family: Arial, Helvetica, sans-serif">
+		<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #eef3f8">
+			<tr>
+				<td align="center" style="padding: 36px 16px">
+					<table
+						role="presentation"
+						width="100%"
+						cellspacing="0"
+						cellpadding="0"
+						border="0"
+						style="max-width: 600px; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(16, 42, 67, 0.12)"
+					>
+						<tr>
+							<td style="padding: 34px 40px; background: #102a43; color: #ffffff">
+								<div
+									style="
+										display: inline-block;
+										padding: 6px 11px;
+										border: 1px solid rgba(255, 255, 255, 0.35);
+										border-radius: 999px;
+										color: #d9eaff;
+										font-size: 12px;
+										font-weight: 700;
+										letter-spacing: 1.4px;
+										text-transform: uppercase;
+									"
+								>
+									Erasmus+
+								</div>
+								<h1 style="margin: 18px 0 6px; font-size: 29px; line-height: 1.2; color: #ffffff">Vitajte v hodnotiacom systéme</h1>
+								<p style="margin: 0; color: #c9d8e6; font-size: 16px; line-height: 1.55">Prihlášky do programu Erasmus+</p>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 38px 40px 34px">
+								<p style="margin: 0 0 18px; font-size: 17px; line-height: 1.65; color: #334e68">Dobrý deň,</p>
+								<p style="margin: 0 0 18px; font-size: 17px; line-height: 1.65; color: #334e68">
+									administrátor vás pozval do <strong>systému na hodnotenie prihlášok</strong> do programu Erasmus+.
+								</p>
+								<p style="margin: 0 0 28px; font-size: 16px; line-height: 1.65; color: #486581">
+									Kliknite na tlačidlo nižšie, nastavte si svoje heslo a potom môžete začať pracovať s pridelenými prihláškami.
+								</p>
+								<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 28px">
+									<tr>
+										<td bgcolor="#147d92" style="border-radius: 10px">
+											<a
+												href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=invite"
+												style="
+													display: inline-block;
+													padding: 15px 24px;
+													color: #ffffff;
+													text-decoration: none;
+													font-size: 16px;
+													font-weight: 700;
+													line-height: 1.2;
+												"
+												>Nastaviť heslo a vstúpiť do systému</a
+											>
+										</td>
+									</tr>
+								</table>
+								<div
+									style="
+										padding: 16px 18px;
+										background: #f4f7fb;
+										border-left: 4px solid #3eb6c1;
+										border-radius: 8px;
+										color: #486581;
+										font-size: 14px;
+										line-height: 1.55;
+									"
+								>
+									Tento bezpečnostný odkaz je určený iba pre vás, je časovo obmedzený a možno ho použiť iba raz.
+								</div>
+								<p style="margin: 28px 0 8px; font-size: 13px; line-height: 1.5; color: #829ab1">
+									Ak tlačidlo nefunguje, skopírujte do prehliadača tento odkaz:
+								</p>
+								<p style="margin: 0; word-break: break-all; font-size: 13px; line-height: 1.5">
+									<a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=invite" style="color: #147d92; text-decoration: underline"
+										>{{ .RedirectTo }}?token_hash={{ .TokenHash }}&amp;type=invite</a
+									>
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td style="padding: 22px 40px; background: #f8fafc; border-top: 1px solid #e6edf3; color: #829ab1; font-size: 12px; line-height: 1.55">
+								Ak ste túto pozvánku neočakávali, e-mail môžete bezpečne ignorovať. Na túto správu nie je potrebné odpovedať.
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
 </html>
