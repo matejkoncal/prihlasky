@@ -152,23 +152,22 @@ describe("AdminDashboard", () => {
 		expect(within(metrics).getByText("Pridelené")).toBeInTheDocument();
 		expect(within(metrics).getAllByText("5/5")).toHaveLength(2);
 		expect(within(metrics).getByText("Hotové")).toBeInTheDocument();
-		expect(screen.getByText("Kritérium splnené")).toBeInTheDocument();
+		const state = screen.getByTestId("application-state");
+		expect(within(state).getByText("Kritérium splnené")).toBeInTheDocument();
 		expect(screen.getByTestId("application-actions")).toBeInTheDocument();
-		expect(within(identity).getByRole("link", { name: /Exportovať hodnotenie PDF/ })).toHaveAttribute(
+		expect(within(state).getByRole("link", { name: /Exportovať hodnotenie PDF/ })).toHaveAttribute(
 			"href",
 			"/admin/prihlasky/66666666-6666-6666-6666-666666666666/hodnotenie.pdf"
 		);
 		expect(within(screen.getByTestId("application-actions")).queryByRole("link", { name: /Exportovať hodnotenie PDF/ })).not.toBeInTheDocument();
-		expect(metrics).toHaveStyle({ flexDirection: "column" });
-		expect(screen.getByTestId("application-result-status")).toHaveStyle({ minHeight: "24px" });
 	});
 
-	it("keeps an empty result row reserved for unfinished applications", () => {
+	it("uses a compact unified list and shows a meaningful state for unfinished applications", () => {
 		render(<AdminDashboard applications={applications} reviewers={reviewers} />);
 
-		const status = screen.getByTestId("application-result-status");
-		expect(status).toHaveStyle({ minHeight: "24px" });
-		expect(within(status).queryByText(/Kritérium/)).not.toBeInTheDocument();
+		expect(screen.getByTestId("application-list")).toBeInTheDocument();
+		expect(screen.getByTestId("application-row")).toHaveStyle({ minHeight: "104px" });
+		expect(within(screen.getByTestId("application-state")).getByText("Čaká na pridelenie")).toBeInTheDocument();
 	});
 
 	it("requires confirmation before permanently deleting an application", async () => {
