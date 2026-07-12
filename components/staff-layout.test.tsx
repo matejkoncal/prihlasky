@@ -50,11 +50,23 @@ describe("StaffLayout", () => {
     const { rerender } = render(<StaffLayout user={admin}><div>Obsah</div></StaffLayout>);
 
     expect(screen.getByRole("img", { name: "SOŠTaR" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "SOŠTaR" })).toHaveAttribute("width", "36");
+    expect(screen.getByText("MK")).toBeInTheDocument();
     expect(screen.getByText("Matej Koncal")).toBeInTheDocument();
     expect(screen.getByText("Admin")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Odhlásiť sa" })).toBeInTheDocument();
+    expect(screen.queryByText("Odhlásiť sa")).not.toBeInTheDocument();
 
     rerender(<StaffLayout user={reviewer}><div>Obsah</div></StaffLayout>);
     expect(screen.getByText("ucitel@example.sk")).toBeInTheDocument();
     expect(screen.getByText("Hodnotiteľ")).toBeInTheDocument();
+  });
+
+  it("keeps admin navigation in a horizontally scrollable responsive row", () => {
+    render(<StaffLayout user={admin}><div>Obsah</div></StaffLayout>);
+
+    expect(screen.getByTestId("staff-navigation-row")).toHaveStyle({
+      overflowX: "auto",
+    });
   });
 });

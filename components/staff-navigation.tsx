@@ -13,7 +13,7 @@ export function StaffNavigation() {
   const pathname = usePathname() ?? "";
 
   return (
-    <Box component="nav" aria-label="Administrácia" sx={{ display: "flex", alignSelf: "stretch", alignItems: "stretch" }}>
+    <Box component="nav" aria-label="Administrácia" sx={{ display: "flex", alignItems: "center", justifyContent: { xs: "flex-start", md: "center" }, gap: .5, minWidth: "max-content" }}>
       {destinations.map((destination) => {
         const active = destination.matches(pathname);
         return (
@@ -22,15 +22,19 @@ export function StaffNavigation() {
             href={destination.href}
             color="inherit"
             aria-current={active ? "page" : undefined}
+            data-active={active}
             sx={{
-              px: { xs: 1.25, sm: 2 },
-              borderRadius: 0,
-              borderBottom: "3px solid",
-              borderColor: active ? "#54d2dc" : "transparent",
-              bgcolor: active ? "rgba(255,255,255,.1)" : "transparent",
-              fontWeight: active ? 800 : 600,
-              opacity: active ? 1 : .78,
-              "&:hover": { bgcolor: "rgba(255,255,255,.12)", opacity: 1 },
+              px: { xs: 1.4, sm: 1.75 },
+              py: .75,
+              minHeight: 36,
+              borderRadius: 2,
+              textTransform: "none",
+              whiteSpace: "nowrap",
+              bgcolor: active ? "rgba(125,226,232,.16)" : "transparent",
+              color: active ? "#a8f0f3" : "rgba(255,255,255,.7)",
+              fontSize: 13,
+              fontWeight: active ? 800 : 650,
+              "&:hover": { bgcolor: active ? "rgba(125,226,232,.2)" : "rgba(255,255,255,.08)", color: "white" },
             }}
           >
             {destination.label}

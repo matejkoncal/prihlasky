@@ -18,7 +18,9 @@ describe("administrator navigation", () => {
     render(<StaffLayout user={admin}><div>Obsah</div></StaffLayout>);
 
     expect(screen.getByRole("link", { name: "Prihlášky" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Prihlášky" })).toHaveAttribute("data-active", "true");
     expect(screen.getByRole("link", { name: "Používatelia" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Používatelia" })).toHaveAttribute("data-active", "false");
   });
 
   it("marks users as the current section", () => {
